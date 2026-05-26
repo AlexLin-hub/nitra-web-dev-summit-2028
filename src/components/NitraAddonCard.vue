@@ -184,7 +184,7 @@ function setQuantity(delta) {
           <q-select
             :model-value="selectedSize"
             :options="addon.sizes"
-            placeholder="Select"
+            :display-value="selectedSize ? undefined : 'Select'"
             dense
             outlined
             :disable="disabled"
