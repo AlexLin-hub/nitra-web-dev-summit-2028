@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from "vue";
+import { computed } from "vue";
 
 /**
  * modelValue shape:
@@ -108,9 +108,10 @@ function setQuantity(delta) {
     @keydown.space.prevent="toggleCard"
     @keydown.enter.prevent="toggleCard"
     :class="[
-      'flex flex-col gap-2 rounded-xl border-2 p-4 transition-all duration-150 outline-none',
+      'flex flex-col gap-2 rounded-lg border p-4 outline-none transition-all duration-150',
+      'shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]',
       isAdded
-        ? 'bg-brand-subtle-rest border-brand-emphasis'
+        ? 'bg-brand-muted-rest border-brand-emphasis'
         : disabled
           ? 'bg-surface-l2 border-neutral-muted opacity-60'
           : 'bg-surface-l0 border-neutral-muted',
@@ -119,32 +120,40 @@ function setQuantity(delta) {
     ]"
   >
     <!-- Header: name + price -->
-    <div class="flex items-start justify-between gap-3">
+    <div class="flex items-center justify-between gap-3">
       <span class="text-subtitle1 text-neutral">{{ addon.name }}</span>
       <span class="text-subtitle1 text-neutral shrink-0">{{ formattedPrice }}</span>
     </div>
 
     <!-- Description -->
-    <p class="text-[length:var(--font-size-sm)] text-neutral-muted">
+    <p class="text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted">
       {{ addon.description }}
     </p>
 
     <!-- Workshop: time + spots -->
     <template v-if="addon.category === 'workshop'">
-      <p v-if="timeRange" class="text-[length:var(--font-size-sm)] text-neutral-quiet">
+      <p
+        v-if="timeRange"
+        class="text-[length:var(--font-size-sm)] leading-[16px] text-neutral-quiet"
+      >
         {{ timeRange }}
       </p>
-      <p v-if="spotsLeft != null" class="text-[length:var(--font-size-sm)] text-neutral-muted">
+      <p
+        v-if="spotsLeft != null"
+        class="text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted"
+      >
         {{ spotsLeft }} spots remaining
       </p>
     </template>
 
     <!-- Merchandise: size selector + qty stepper -->
     <template v-if="isMerchandise">
-      <div class="flex items-center gap-4 flex-wrap" @click.stop>
+      <div class="flex flex-wrap items-center gap-4" @click.stop>
         <!-- Size selector (only when addon has sizes) -->
         <div v-if="addon.sizes?.length" class="flex items-center gap-2">
-          <span class="text-[length:var(--font-size-sm)] text-neutral-muted">Size:</span>
+          <span class="text-[length:var(--font-size-sm)] font-medium text-neutral-muted">
+            Size:
+          </span>
           <q-select
             :model-value="selectedSize"
             :options="addon.sizes"
@@ -152,33 +161,34 @@ function setQuantity(delta) {
             dense
             outlined
             :disable="disabled"
-            style="min-width: 80px"
-            class="text-[length:var(--font-size-sm)]"
+            class="nitra-addon-size text-[length:var(--font-size-sm)]"
             @update:model-value="setSize"
           />
         </div>
 
         <!-- Qty stepper -->
         <div class="flex items-center gap-2">
-          <span class="text-[length:var(--font-size-sm)] text-neutral-muted">Qty:</span>
+          <span class="text-[length:var(--font-size-sm)] font-medium text-neutral-muted">
+            Qty:
+          </span>
           <button
             :disabled="disabled || quantity <= 0"
-            class="w-7 h-7 rounded-md bg-surface-l2 flex items-center justify-center text-neutral transition-colors hover:bg-surface-l3 disabled:opacity-40 disabled:cursor-not-allowed"
+            class="flex h-7 w-7 items-center justify-center rounded-md bg-surface-l2 text-neutral transition-colors hover:bg-surface-l3 disabled:cursor-not-allowed disabled:opacity-40"
             @click.stop="setQuantity(-1)"
           >
             <q-icon name="remove" size="14px" />
           </button>
-          <span class="text-[length:var(--font-size-sm)] text-neutral w-4 text-center">
+          <span class="w-6 text-center text-[length:var(--font-size-md)] font-semibold leading-[14px] text-neutral">
             {{ quantity }}
           </span>
           <button
             :disabled="disabled || quantity >= (addon.maxQuantity ?? 99)"
-            class="w-7 h-7 rounded-md bg-surface-l2 flex items-center justify-center text-neutral transition-colors hover:bg-surface-l3 disabled:opacity-40 disabled:cursor-not-allowed"
+            class="flex h-7 w-7 items-center justify-center rounded-md bg-surface-l2 text-neutral transition-colors hover:bg-surface-l3 disabled:cursor-not-allowed disabled:opacity-40"
             @click.stop="setQuantity(1)"
           >
             <q-icon name="add" size="14px" />
           </button>
-          <span class="text-[length:var(--font-size-sm)] text-neutral-quiet">
+          <span class="text-[10px] leading-[14px] text-neutral-quiet">
             max {{ addon.maxQuantity }}
           </span>
         </div>
@@ -187,10 +197,23 @@ function setQuantity(delta) {
 
     <!-- "Added to order" badge -->
     <div v-if="isAdded" class="mt-1">
-      <span class="inline-flex items-center gap-1 text-[length:var(--font-size-sm)] text-brand font-semibold">
-        <q-icon name="check" size="14px" />
+      <span class="inline-flex items-center gap-1 text-[11px] font-semibold leading-[14px] text-success">
+        <q-icon name="check" size="12px" />
         Added to order
       </span>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Tighten Quasar's outlined select to match the 28px height in the Figma spec. */
+.nitra-addon-size :deep(.q-field__control) {
+  height: 28px;
+  min-height: 28px;
+  border-radius: 6px;
+}
+.nitra-addon-size :deep(.q-field__native) {
+  min-height: 28px;
+  padding: 0;
+}
+</style>

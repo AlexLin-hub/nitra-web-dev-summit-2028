@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 const props = defineProps({
   /**
-   * 'info'   — blue icon, neutral title, muted body
+   * 'info'   — blue icon, neutral title, neutral body, info-tinted surface
    * 'danger' — no icon, danger title, danger bullet list
    */
   variant: {
@@ -35,44 +35,47 @@ const props = defineProps({
 const config = computed(() =>
   props.variant === "info"
     ? {
-        bg: "bg-info-subtle-rest",
-        icon: "info",
-        iconColor: "text-info",
-        titleColor: "text-neutral",
-        textColor: "text-neutral-muted",
-        role: "status",
+        container:
+          "bg-info-subtle-rest border border-info-opacity rounded-lg gap-3",
         showIcon: true,
+        iconColor: "text-info",
+        titleSize: "text-[length:var(--font-size-md)] leading-[20px] font-semibold",
+        titleColor: "text-neutral",
+        bodySize: "text-[length:var(--font-size-md)] leading-[20px]",
+        bodyColor: "text-neutral",
+        gap: "gap-1",
+        role: "status",
       }
     : {
-        bg: "bg-danger-subtle-rest",
-        titleColor: "text-danger",
-        textColor: "text-danger",
-        role: "alert",
+        container:
+          "bg-danger-muted-rest border border-danger-muted rounded-md gap-2",
         showIcon: false,
+        titleSize: "text-[length:var(--font-size-sm)] leading-[16px] font-medium",
+        titleColor: "text-danger",
+        bodySize: "text-[length:var(--font-size-sm)] leading-[16px]",
+        bodyColor: "text-danger",
+        gap: "gap-2",
+        role: "alert",
       }
 );
 </script>
 
 <template>
-  <div
-    :role="config.role"
-    :class="['flex gap-3 rounded-xl p-4', config.bg]"
-  >
+  <div :role="config.role" :class="['flex items-start p-4', config.container]">
     <!-- Icon (info only) -->
     <q-icon
       v-if="config.showIcon"
       name="info"
       size="20px"
-      :class="['shrink-0 mt-0.5', config.iconColor]"
+      :class="['shrink-0', config.iconColor]"
     />
 
     <!-- Content -->
-    <div class="flex flex-col gap-1 min-w-0">
+    <div :class="['flex min-w-0 flex-col', config.gap]">
       <!-- Title -->
       <p
         v-if="title"
-        class="text-[length:var(--font-size-sm)] font-semibold"
-        :class="config.titleColor"
+        :class="[config.titleSize, config.titleColor]"
       >
         {{ title }}
       </p>
@@ -82,8 +85,7 @@ const config = computed(() =>
         <slot>
           <p
             v-if="message"
-            class="text-[length:var(--font-size-sm)]"
-            :class="config.textColor"
+            :class="[config.bodySize, config.bodyColor]"
           >
             {{ message }}
           </p>
@@ -91,14 +93,17 @@ const config = computed(() =>
       </template>
 
       <!-- Bullet list (danger) -->
-      <ul v-else class="flex flex-col gap-0.5">
+      <ul v-else class="flex flex-col gap-2">
         <li
           v-for="(msg, index) in messages"
           :key="index"
-          class="flex items-start gap-1.5 text-[length:var(--font-size-sm)]"
-          :class="config.textColor"
+          :class="[
+            'flex items-start gap-1.5',
+            config.bodySize,
+            config.bodyColor,
+          ]"
         >
-          <span class="mt-px">•</span>
+          <span>•</span>
           <span>{{ msg }}</span>
         </li>
       </ul>

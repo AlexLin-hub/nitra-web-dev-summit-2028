@@ -56,24 +56,24 @@ const isFocused = ref(false);
     <!-- Label -->
     <label
       v-if="label"
-      class="text-[length:var(--font-size-sm)] font-semibold select-none"
+      class="text-[length:var(--font-size-sm)] font-medium select-none"
       :class="error ? 'text-danger' : 'text-neutral'"
     >
       {{ label
       }}<span v-if="required" class="text-danger"> *</span
-      ><span v-if="optional" class="text-neutral-muted font-regular"> (Optional)</span>
+      ><span v-if="optional" class="font-regular"> (Optional)</span>
     </label>
 
     <!-- Input wrapper — border state handled here, q-input handles native behavior -->
     <div
       :class="[
-        'rounded-xl border-2 bg-surface-l0 px-3 transition-colors duration-150',
+        'rounded-md border bg-surface-l0 px-3 transition-colors duration-150',
         error
           ? 'border-danger-emphasis'
-          : isFocused
-            ? 'border-brand-emphasis'
-            : disabled
-              ? 'border-neutral-quiet bg-disable'
+          : disabled
+            ? 'border-neutral-muted bg-disable'
+            : isFocused
+              ? 'border-neutral-emphasis'
               : 'border-neutral-muted',
       ]"
     >
@@ -87,7 +87,7 @@ const isFocused = ref(false);
         hide-bottom-space
         no-error-icon
         class="w-full"
-        input-class="text-[length:var(--font-size-sm)] text-neutral placeholder-text-neutral-quiet py-2.5"
+        input-class="text-[length:var(--font-size-lg)] text-neutral placeholder-text-neutral-quiet py-2.5"
         @update:model-value="emit('update:modelValue', $event)"
         @focus="isFocused = true"
         @blur="isFocused = false"
@@ -97,7 +97,7 @@ const isFocused = ref(false);
     <!-- Error message -->
     <p
       v-if="error && errorMessage"
-      class="text-[length:var(--font-size-sm)] text-danger"
+      class="text-[11px] leading-[14px] text-danger"
     >
       {{ errorMessage }}
     </p>

@@ -44,27 +44,26 @@ const stepCount = computed(() => props.steps.length);
 </script>
 
 <template>
-  <div role="tablist" aria-label="Steps" class="flex items-center w-full">
+  <div role="tablist" aria-label="Steps" class="flex w-full items-center">
     <template v-for="(step, index) in steps" :key="index">
       <!-- Step: circle + label side by side -->
-      <div class="flex items-center gap-2 shrink-0">
+      <div class="flex shrink-0 items-center gap-2.5">
         <button
           role="tab"
           :aria-selected="modelValue === index + 1"
           :aria-label="`Step ${index + 1}${step ? ': ' + step : ''}`"
           :disabled="!clickable"
           :tabindex="clickable ? 0 : -1"
-          class="flex items-center justify-center shrink-0 w-8 h-8 rounded-full border-2 transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-brand-emphasis"
+          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full outline-none transition-all duration-150 focus-visible:ring-2 focus-visible:ring-brand-emphasis"
           :class="{
-            'bg-brand-emphasis-rest border-brand-emphasis text-inverse cursor-default':
-              getStepState(index) === 'active',
-            'bg-brand-emphasis-rest border-brand-emphasis text-inverse':
+            'bg-brand-emphasis-rest text-inverse cursor-default':
+              getStepState(index) === 'active' ||
               getStepState(index) === 'completed',
-            'bg-danger-emphasis-rest border-danger-emphasis text-inverse':
+            'bg-danger-emphasis-rest text-inverse':
               getStepState(index) === 'error',
-            'bg-surface-l0 border-neutral-muted text-neutral-muted cursor-default':
+            'bg-surface-l2 text-neutral-quiet cursor-default':
               getStepState(index) === 'pending',
-            'cursor-pointer hover:border-brand-muted':
+            'cursor-pointer hover:bg-brand-muted-rest':
               clickable && getStepState(index) === 'pending',
           }"
           @click="handleStepClick(index)"
@@ -72,16 +71,16 @@ const stepCount = computed(() => props.steps.length);
           <q-icon
             v-if="getStepState(index) === 'completed'"
             name="check"
-            size="14px"
+            size="16px"
           />
           <q-icon
             v-else-if="getStepState(index) === 'error'"
             name="priority_high"
-            size="14px"
+            size="16px"
           />
           <span
             v-else
-            class="text-[length:var(--font-size-sm)] font-semibold leading-none"
+            class="text-[length:var(--font-size-md)] font-semibold leading-none"
           >
             {{ index + 1 }}
           </span>
@@ -89,13 +88,13 @@ const stepCount = computed(() => props.steps.length);
 
         <!-- Label to the right of the circle -->
         <span
-          class="text-[length:var(--font-size-sm)] whitespace-nowrap transition-colors duration-150"
+          class="whitespace-nowrap text-[13px] leading-none transition-colors duration-150"
           :class="{
-            'text-neutral font-semibold':
-              getStepState(index) === 'active' ||
-              getStepState(index) === 'completed',
+            'text-neutral font-semibold': getStepState(index) === 'active',
+            'text-neutral font-medium': getStepState(index) === 'completed',
             'text-danger font-semibold': getStepState(index) === 'error',
-            'text-neutral-muted': getStepState(index) === 'pending',
+            'text-neutral-quiet font-regular':
+              getStepState(index) === 'pending',
           }"
         >
           {{ step }}
@@ -105,11 +104,11 @@ const stepCount = computed(() => props.steps.length);
       <!-- Connector line between label and next step -->
       <div
         v-if="index < stepCount - 1"
-        class="flex-1 h-px mx-3 transition-colors duration-150"
+        class="mx-4 h-0.5 flex-1 rounded-[1px] transition-colors duration-150"
         :class="
           getStepState(index) === 'completed'
             ? 'bg-brand-emphasis-rest'
-            : 'bg-[var(--divider-default)]'
+            : 'bg-surface-l2'
         "
       />
     </template>
