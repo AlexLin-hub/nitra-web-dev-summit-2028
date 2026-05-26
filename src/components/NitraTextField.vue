@@ -59,15 +59,14 @@ const isFocused = ref(false);
       class="text-[length:var(--font-size-sm)] font-medium select-none"
       :class="error ? 'text-danger' : 'text-neutral'"
     >
-      {{ label
-      }}<span v-if="required" class="text-danger"> *</span
+      {{ label }}<span v-if="required" class="text-danger"> *</span
       ><span v-if="optional" class="font-regular"> (Optional)</span>
     </label>
 
     <!-- Input wrapper — border state handled here, q-input handles native behavior -->
     <div
       :class="[
-        'rounded-md border bg-surface-l0 px-3 transition-colors duration-150',
+        'rounded-md border border-solid bg-surface-l0 px-3 transition-colors duration-150',
         error
           ? 'border-danger-emphasis'
           : disabled
