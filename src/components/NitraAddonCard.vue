@@ -43,6 +43,15 @@ const quantity = computed(() => props.modelValue?.quantity ?? 0);
 const selectedSize = computed(() => props.modelValue?.size ?? null);
 const isAdded = computed(() => quantity.value > 0);
 
+// ── Display name ──────────────────────────────────────────────────
+// For addons with sizes, strip any parenthesised default from the name
+// and replace it with the currently selected size.
+const displayName = computed(() => {
+  if (!props.addon.sizes?.length) return props.addon.name;
+  const baseName = props.addon.name.replace(/\s*\([^)]*\)$/, "").trim();
+  return selectedSize.value ? `${baseName} (${selectedSize.value})` : baseName;
+});
+
 // ── Price ─────────────────────────────────────────────────────────
 const effectivePrice = computed(() => {
   if (props.vipDiscount && props.addon.category === "workshop") {
@@ -95,10 +104,11 @@ function setSize(size) {
 function setQuantity(delta) {
   const max = props.addon.maxQuantity ?? 99;
   const next = Math.min(Math.max(quantity.value + delta, 0), max);
-  emit("update:modelValue", {
-    quantity: next,
-    size: selectedSize.value,
-  });
+  const size =
+    next > 0 && props.addon.sizes?.length && selectedSize.value === null
+      ? props.addon.sizes[0]
+      : selectedSize.value;
+  emit("update:modelValue", { quantity: next, size });
 }
 </script>
 
@@ -124,12 +134,15 @@ function setQuantity(delta) {
         !disabled &&
         !isAdded &&
         'cursor-pointer hover:border-brand-muted hover:bg-brand-subtle-hover',
-      isWorkshopOrMeal && !disabled && !isAdded && 'focus-visible:border-brand-emphasis',
+      isWorkshopOrMeal &&
+        !disabled &&
+        !isAdded &&
+        'focus-visible:border-brand-emphasis',
     ]"
   >
     <!-- Header: name + price -->
     <div class="flex items-center justify-between gap-3">
-      <span class="text-subtitle1 text-neutral">{{ addon.name }}</span>
+      <span class="text-subtitle1 text-neutral">{{ displayName }}</span>
       <span class="text-subtitle1 text-neutral shrink-0">{{
         formattedPrice
       }}</span>
@@ -236,6 +249,11 @@ function setQuantity(delta) {
   min-height: 28px;
   padding: 0;
 }
+.nitra-addon-size :deep(.q-field__append) {
+  font-size: 12px;
+  height: auto;
+}
+
 p {
   padding: 0;
   margin: 0;
