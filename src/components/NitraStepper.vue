@@ -46,20 +46,19 @@ const stepCount = computed(() => props.steps.length);
 <template>
   <div role="tablist" aria-label="Steps" class="flex w-full items-center">
     <template v-for="(step, index) in steps" :key="index">
-      <!-- Step: circle + label side by side -->
-      <div class="flex shrink-0 items-center gap-2.5">
+      <div class="flex shrink-0 items-center gap-[10px]">
         <button
           role="tab"
           :aria-selected="modelValue === index + 1"
           :aria-label="`Step ${index + 1}${step ? ': ' + step : ''}`"
           :disabled="!clickable"
           :tabindex="clickable ? 0 : -1"
-          class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full outline-none transition-all duration-150 focus-visible:ring-2 focus-visible:ring-brand-emphasis"
+          class="border-none flex h-8 w-8 shrink-0 items-center justify-center rounded-full outline-none transition-all duration-150 focus-visible:ring-2 focus-visible:ring-brand-emphasis"
           :class="{
-            'bg-brand-emphasis-rest text-inverse cursor-default':
+            'bg-brand-emphasis-rest text-inverse cursor-default disabled:!opacity-100':
               getStepState(index) === 'active' ||
               getStepState(index) === 'completed',
-            'bg-danger-emphasis-rest text-inverse':
+            'bg-danger-emphasis-rest text-inverse disabled:!opacity-100':
               getStepState(index) === 'error',
             'bg-surface-l2 text-neutral-quiet cursor-default':
               getStepState(index) === 'pending',
@@ -78,30 +77,25 @@ const stepCount = computed(() => props.steps.length);
             name="priority_high"
             size="16px"
           />
-          <span
-            v-else
-            class="text-[length:var(--font-size-md)] font-semibold leading-none"
-          >
+          <span v-else class="text-[14px] font-semibold leading-none">
             {{ index + 1 }}
           </span>
         </button>
 
-        <!-- Label to the right of the circle -->
         <span
           class="whitespace-nowrap text-[13px] leading-none transition-colors duration-150"
           :class="{
             'text-neutral font-semibold': getStepState(index) === 'active',
             'text-neutral font-medium': getStepState(index) === 'completed',
             'text-danger font-semibold': getStepState(index) === 'error',
-            'text-neutral-quiet font-regular':
-              getStepState(index) === 'pending',
+            'text-neutral-quiet font-normal': getStepState(index) === 'pending',
           }"
         >
           {{ step }}
         </span>
       </div>
 
-      <!-- Connector line between label and next step -->
+      <!-- Connector: only completed steps get brand color; error/active/pending get surface-l2 -->
       <div
         v-if="index < stepCount - 1"
         class="mx-4 h-0.5 flex-1 rounded-[1px] transition-colors duration-150"

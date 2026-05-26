@@ -57,7 +57,7 @@ const formattedPrice = computed(
     @keydown.enter.prevent="select"
     @keydown.space.prevent="select"
     :class="[
-      'flex flex-col gap-3 rounded-md p-5 transition-all duration-150 outline-none w-full',
+      'flex border-solid flex-col gap-3 rounded-md p-5 transition-all duration-150 outline-none w-full',
       'shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]',
       isSelected
         ? 'border-2 border-brand-emphasis bg-brand-muted-rest cursor-pointer'
@@ -76,23 +76,19 @@ const formattedPrice = computed(
     <!-- Description -->
     <p
       v-if="description"
-      class="text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted w-full"
+      class="text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted w-full m-0"
     >
       {{ description }}
     </p>
 
     <!-- Perks list -->
-    <ul v-if="perks.length" class="flex flex-col gap-2">
+    <ul v-if="perks.length" class="flex flex-col gap-2 p-0 m-0">
       <li
         v-for="perk in perks"
         :key="perk"
         class="flex items-center gap-2 text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted"
       >
-        <q-icon
-          name="check_circle"
-          size="14px"
-          class="text-neutral-muted shrink-0"
-        />
+        <q-icon name="check_circle" size="14px" class="text-neutral shrink-0" />
         {{ perk }}
       </li>
     </ul>
@@ -102,7 +98,8 @@ const formattedPrice = computed(
       v-if="isSelected"
       class="self-start inline-flex items-center rounded-full bg-success-bold-rest px-[9px] py-[3px] text-[11px] leading-[14px] text-inverse font-medium"
     >
-      ✓ Selected
+      <q-icon name="check" size="14px" class="mr-1" />
+      Selected
     </span>
   </div>
 </template>

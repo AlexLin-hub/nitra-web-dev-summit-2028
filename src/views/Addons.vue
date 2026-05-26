@@ -29,7 +29,7 @@ const CATEGORY_TABS = [
 const activeCategory = ref("workshop");
 
 const currentAddons = computed(
-  () => addonsByCategory.value.get(activeCategory.value) ?? []
+  () => addonsByCategory.value.get(activeCategory.value) ?? [],
 );
 
 // ── Disabled logic ────────────────────────────────────────────────────
@@ -115,6 +115,14 @@ const summaryItems = computed(() => {
         variant="info"
         title="Shipping Information"
         message="Merchandise items will be shipped to your address one week before the conference. Please ensure your shipping address in Step 1 is correct."
+      />
+
+      <!-- VIP lunch-included notice (meal packages only) -->
+      <NitraAlert
+        v-if="activeCategory === 'meal' && isVip"
+        variant="info"
+        title="Lunch Already Included"
+        message="Your VIP ticket includes lunch on both conference days. You may still add the Premium Dinner or other meal options below."
       />
 
       <!-- Addon cards -->

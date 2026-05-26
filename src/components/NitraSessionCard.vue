@@ -63,33 +63,26 @@ const remainingRatio = computed(() => spotsLeft.value / props.session.capacity);
 /**
  * Returns the design-token color class shared between the capacity bar fill
  * and the "X spots left" label.
- *   sold out         → danger
- *   ≤ 25% remaining  → accent (orange)
- *   ≤ 50% remaining  → warning (yellow)
- *   > 50% remaining  → brand-emphasis (teal)
+ *   disabled or sold out  → warning (yellow)
+ *   > 50% remaining       → brand-emphasis (teal)
+ *   ≤ 50% remaining       → accent/orange-600
  */
 const capacityToken = computed(() => {
-  if (isSoldOut.value) {
-    return { fill: "bg-danger-emphasis-rest", text: "text-danger-emphasis" };
+  if (props.disabled || isSoldOut.value) {
+    return { fill: "bg-yellow-800", text: "text-yellow-800" };
   }
-  if (props.disabled) {
-    return { fill: "bg-warning-emphasis-rest", text: "text-warning" };
+  if (remainingRatio.value > 0.5) {
+    return { fill: "bg-brand-emphasis-rest", text: "text-brand-emphasis" };
   }
-  if (remainingRatio.value <= 0.25) {
-    return { fill: "bg-accent-bold-rest", text: "text-accent-emphasis" };
-  }
-  if (remainingRatio.value <= 0.5) {
-    return { fill: "bg-warning-emphasis-rest", text: "text-warning" };
-  }
-  return { fill: "bg-brand-emphasis-rest", text: "text-brand-emphasis" };
+  return { fill: "bg-accent-bold-rest", text: "text-accent-emphasis" };
 });
 
 // ── Track badge ───────────────────────────────────────────────────
 const trackStyleMap = {
   main: { bg: "bg-neutral-subtle-rest", text: "text-neutral-muted" },
-  frontend: { bg: "bg-accent-muted-rest", text: "text-accent-emphasis" },
+  frontend: { bg: "bg-warning-muted-rest", text: "text-warning-emphasis" },
   backend: { bg: "bg-info-muted-rest", text: "text-info-emphasis" },
-  devops: { bg: "bg-warning-muted-rest", text: "text-warning-emphasis" },
+  devops: { bg: "bg-accent-muted-rest", text: "text-accent-emphasis" },
 };
 
 const trackStyle = computed(
@@ -107,7 +100,7 @@ const trackStyle = computed(
     @keydown.space.prevent="toggle"
     @keydown.enter.prevent="toggle"
     :class="[
-      'flex flex-col gap-2 rounded-md p-4 outline-none transition-all duration-150',
+      'border-solid flex flex-col gap-2 rounded-md p-4 outline-none transition-all duration-150',
       'shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]',
       isSelected
         ? 'border-2 border-brand-emphasis bg-brand-muted-rest cursor-pointer'
@@ -133,7 +126,7 @@ const trackStyle = computed(
       <div
         v-if="!disabled"
         :class="[
-          'flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors',
+          'border-solid flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors',
           isSelected
             ? 'border-brand-emphasis bg-brand-emphasis-rest'
             : 'border-neutral-emphasis bg-surface-l0',
@@ -184,12 +177,17 @@ const trackStyle = computed(
     <!-- Spots left / Sold out -->
     <p
       class="text-[11px] leading-[14px]"
-      :class="[
-        capacityToken.text,
-        isSoldOut ? 'font-semibold' : 'font-medium',
-      ]"
+      :class="[capacityToken.text, isSoldOut ? 'font-semibold' : 'font-medium']"
     >
       {{ isSoldOut ? "Sold Out" : `${spotsLeft} spots left` }}
     </p>
   </div>
 </template>
+
+<style scoped>
+p,
+h3 {
+  padding: 0;
+  margin: 0;
+}
+</style>
