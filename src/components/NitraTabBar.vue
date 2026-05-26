@@ -20,7 +20,7 @@ const emit = defineEmits(["update:modelValue"]);
 <template>
   <div
     role="tablist"
-    class="inline-flex items-center gap-1 rounded-full bg-surface-l2 p-1"
+    class="inline-flex items-center gap-1 rounded-[10px] bg-surface-l2 p-1"
   >
     <button
       v-for="tab in tabs"
@@ -28,11 +28,11 @@ const emit = defineEmits(["update:modelValue"]);
       role="tab"
       :aria-selected="modelValue === tab.value"
       :tabindex="modelValue === tab.value ? 0 : -1"
-      class="rounded-full px-4 py-1.5 text-[length:var(--font-size-sm)] transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-brand-emphasis"
+      class="rounded-lg px-5 py-2 text-[13px] leading-none outline-none transition-all duration-150 focus-visible:ring-2 focus-visible:ring-brand-emphasis"
       :class="
         modelValue === tab.value
           ? 'bg-brand-emphasis-rest text-inverse font-semibold cursor-default'
-          : 'text-neutral-muted hover:text-neutral cursor-pointer'
+          : 'text-neutral-muted font-medium hover:text-neutral cursor-pointer'
       "
       @click="emit('update:modelValue', tab.value)"
     >

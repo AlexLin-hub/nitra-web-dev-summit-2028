@@ -57,12 +57,13 @@ const formattedPrice = computed(
     @keydown.enter.prevent="select"
     @keydown.space.prevent="select"
     :class="[
-      'flex flex-col gap-3 rounded-xl border-2 p-5 transition-all duration-150 outline-none',
+      'flex flex-col gap-3 rounded-md p-5 transition-all duration-150 outline-none w-full',
+      'shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]',
       isSelected
-        ? 'border-brand-emphasis bg-brand-subtle-rest cursor-pointer'
+        ? 'border-2 border-brand-emphasis bg-brand-muted-rest cursor-pointer'
         : disabled
-          ? 'border-neutral-muted bg-disable cursor-not-allowed opacity-50'
-          : 'border-neutral-muted bg-surface-l0 cursor-pointer hover:border-brand-muted hover:bg-brand-subtle-hover',
+          ? 'border border-neutral-muted bg-disable cursor-not-allowed opacity-50'
+          : 'border border-neutral-muted bg-surface-l1 cursor-pointer hover:border-brand-muted hover:bg-brand-subtle-hover',
       !disabled && !isSelected && 'focus-visible:border-brand-emphasis',
     ]"
   >
@@ -75,7 +76,7 @@ const formattedPrice = computed(
     <!-- Description -->
     <p
       v-if="description"
-      class="text-[length:var(--font-size-sm)] text-neutral-muted"
+      class="text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted w-full"
     >
       {{ description }}
     </p>
@@ -85,21 +86,23 @@ const formattedPrice = computed(
       <li
         v-for="perk in perks"
         :key="perk"
-        class="flex items-center gap-2 text-[length:var(--font-size-sm)] text-neutral"
+        class="flex items-center gap-2 text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted"
       >
-        <q-icon name="check_circle" size="16px" class="text-brand shrink-0" />
+        <q-icon
+          name="check_circle"
+          size="14px"
+          class="text-neutral-muted shrink-0"
+        />
         {{ perk }}
       </li>
     </ul>
 
     <!-- Selected badge -->
-    <div v-if="isSelected" class="mt-1">
-      <span
-        class="inline-flex items-center gap-1 rounded-full bg-brand-emphasis-rest px-3 py-1 text-[length:var(--font-size-sm)] text-inverse font-semibold"
-      >
-        <q-icon name="check" size="12px" />
-        Selected
-      </span>
-    </div>
+    <span
+      v-if="isSelected"
+      class="self-start inline-flex items-center rounded-full bg-success-bold-rest px-[9px] py-[3px] text-[11px] leading-[14px] text-inverse font-medium"
+    >
+      ✓ Selected
+    </span>
   </div>
 </template>
