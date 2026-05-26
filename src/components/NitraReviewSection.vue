@@ -1,4 +1,6 @@
 <script setup>
+import { useI18n } from "vue-i18n";
+
 /**
  * NitraReviewSection — Step 4 review card component.
  *
@@ -50,6 +52,7 @@ defineProps({
 });
 
 const emit = defineEmits(["edit"]);
+const { t } = useI18n();
 </script>
 
 <template>
@@ -76,7 +79,7 @@ const emit = defineEmits(["edit"]);
         class="shrink-0 text-[length:var(--font-size-sm)] leading-[16px] font-semibold text-brand underline outline-none hover:no-underline focus-visible:no-underline"
         @click="emit('edit', step)"
       >
-        Edit → Step {{ step }}
+        {{ t('review.edit', { step }) }}
       </button>
     </div>
 

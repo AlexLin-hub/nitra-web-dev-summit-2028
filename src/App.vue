@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
+import { useI18n } from "vue-i18n";
 import { event } from "./mocks/event.js";
 import { useEventRegistration } from "./composables/useEventRegistration.js";
 import logoUrl from "./assets/images/logo.svg";
@@ -13,14 +14,21 @@ import Addons from "./views/Addons.vue";
 import ReviewSubmit from "./views/ReviewSubmit.vue";
 import RegistrationSuccess from "./views/RegistrationSuccess.vue";
 
-const STEP_LABELS = ["Attendee Info", "Sessions", "Add-ons", "Review"];
+const { t, locale } = useI18n();
 
-const NEXT_LABELS = {
-  1: "Next: Session Selection",
-  2: "Next: Add-ons",
-  3: "Next: Review",
-  4: "Submit Registration",
-};
+const STEP_LABELS = computed(() => [
+  t("stepper.attendee"),
+  t("stepper.sessions"),
+  t("stepper.addons"),
+  t("stepper.review"),
+]);
+
+const NEXT_LABELS = computed(() => ({
+  1: t("nextLabels.1"),
+  2: t("nextLabels.2"),
+  3: t("nextLabels.3"),
+  4: t("nextLabels.4"),
+}));
 
 const STEP_VIEWS = {
   1: AttendeeInfo,
@@ -57,7 +65,7 @@ const currentView = computed(
   () => STEP_VIEWS[state.value.currentStep] ?? AttendeeInfo,
 );
 const nextLabel = computed(
-  () => NEXT_LABELS[state.value.currentStep] ?? "Next",
+  () => NEXT_LABELS.value[state.value.currentStep] ?? t("common.next"),
 );
 const hasPrev = computed(() => state.value.currentStep > 1);
 
@@ -75,6 +83,15 @@ function handleNext() {
   } else {
     nextStep();
   }
+}
+
+function setLanguage(lang) {
+  locale.value = lang;
+  localStorage.setItem("lang", lang);
+  // Optional: Update URL without reloading to keep hl sync
+  const url = new URL(window.location);
+  url.searchParams.set("hl", lang);
+  window.history.replaceState({}, "", url);
 }
 
 // Warn the user before closing/refreshing to prevent data loss.
@@ -95,9 +112,36 @@ onBeforeUnmount(() =>
     <header
       class="shrink-0 border-b border-[var(--divider-default)] px-12 py-4 bg-surface-l0 z-20"
     >
-      <div class="flex items-center gap-3">
-        <img :src="logoUrl" alt="Logo" class="w-10 h-10 rounded-lg" />
-        <span class="text-h4 text-neutral">{{ event.name }}</span>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img :src="logoUrl" alt="Logo" class="w-10 h-10 rounded-lg" />
+          <span class="text-h4 text-neutral">{{ event.name }}</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            class="text-[13px] font-medium px-3 py-1.5 rounded-md transition-colors"
+            :class="
+              locale === 'zh-tw'
+                ? 'bg-brand-emphasis-rest text-inverse'
+                : 'text-neutral-muted hover:bg-surface-l2'
+            "
+            @click="setLanguage('zh-tw')"
+          >
+            繁體中文
+          </button>
+          <button
+            class="text-[13px] font-medium px-3 py-1.5 rounded-md transition-colors"
+            :class="
+              locale === 'en-us'
+                ? 'bg-brand-emphasis-rest text-inverse'
+                : 'text-neutral-muted hover:bg-surface-l2'
+            "
+            @click="setLanguage('en-us')"
+          >
+            English
+          </button>
+        </div>
       </div>
     </header>
 
@@ -137,7 +181,7 @@ onBeforeUnmount(() =>
       >
         <NitraButton
           v-if="hasPrev"
-          label="Back"
+          :label="t('common.back')"
           variant="secondary"
           @click="prevStep"
         />

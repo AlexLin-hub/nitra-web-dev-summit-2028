@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { addons } from "../mocks/addons.js";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraTabBar from "../components/NitraTabBar.vue";
@@ -7,6 +8,7 @@ import NitraAddonCard from "../components/NitraAddonCard.vue";
 import NitraAlert from "../components/NitraAlert.vue";
 import NitraReviewSection from "../components/NitraReviewSection.vue";
 
+const { t } = useI18n();
 const {
   state,
   addonsByCategory,
@@ -16,15 +18,16 @@ const {
   removeAddon,
   formattedTotal,
   orderItems,
+  formatCurrency,
 } = useEventRegistration();
 
 // ── Category tabs ─────────────────────────────────────────────────────
 
-const CATEGORY_TABS = [
-  { value: "workshop", label: "Workshops" },
-  { value: "meal", label: "Meal Packages" },
-  { value: "merchandise", label: "Merchandise" },
-];
+const CATEGORY_TABS = computed(() => [
+  { value: "workshop", label: t("addons.tabs.workshop") },
+  { value: "meal", label: t("addons.tabs.meal") },
+  { value: "merchandise", label: t("addons.tabs.merchandise") },
+]);
 
 const activeCategory = ref("workshop");
 
@@ -53,14 +56,6 @@ function handleAddonUpdate(addonId, newValue) {
 
 // ── Order summary ─────────────────────────────────────────────────────
 
-function formatCurrency(amount) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(amount);
-}
-
 const summaryItems = computed(() => {
   const items = [];
 
@@ -77,7 +72,7 @@ const summaryItems = computed(() => {
       });
       const discountAmt = fullSubtotal - item.subtotal;
       items.push({
-        label: "Workshop discount (VIP 10%)",
+        label: t("addons.workshopDiscount"),
         value: `-${formatCurrency(discountAmt)}`,
         discount: true,
       });
@@ -91,7 +86,7 @@ const summaryItems = computed(() => {
   }
 
   items.push({ separator: true });
-  items.push({ label: "Total", value: formattedTotal.value, bold: true });
+  items.push({ label: t("addons.total"), value: formattedTotal.value, bold: true });
 
   return items;
 });
@@ -101,7 +96,7 @@ const summaryItems = computed(() => {
   <div class="flex gap-8 items-start">
     <!-- ── Add-ons list ─────────────────────────────── -->
     <div class="flex flex-col gap-6 flex-1 min-w-0">
-      <h2 class="text-h3 text-neutral">Select Add-ons</h2>
+      <h2 class="text-h3 text-neutral">{{ t('addons.title') }}</h2>
 
       <NitraTabBar
         :model-value="activeCategory"
@@ -113,16 +108,16 @@ const summaryItems = computed(() => {
       <NitraAlert
         v-if="activeCategory === 'merchandise'"
         variant="info"
-        title="Shipping Information"
-        message="Merchandise items will be shipped to your address one week before the conference. Please ensure your shipping address in Step 1 is correct."
+        :title="t('addons.shippingNoticeTitle')"
+        :message="t('addons.shippingNoticeMsg')"
       />
 
       <!-- VIP lunch-included notice (meal packages only) -->
       <NitraAlert
         v-if="activeCategory === 'meal' && isVip"
         variant="info"
-        title="Lunch Already Included"
-        message="Your VIP ticket includes lunch on both conference days. You may still add the Premium Dinner or other meal options below."
+        :title="t('addons.vipLunchTitle')"
+        :message="t('addons.vipLunchMsg')"
       />
 
       <!-- Addon cards -->
@@ -140,7 +135,7 @@ const summaryItems = computed(() => {
     <!-- ── Order summary sidebar ──────────────────────── -->
     <div class="shrink-0 w-[380px]">
       <NitraReviewSection
-        title="Order Summary"
+        :title="t('addons.orderSummary')"
         :compact="true"
         :items="summaryItems"
       />

@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   /**
@@ -25,6 +26,8 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
+const { t, locale } = useI18n();
+
 const isSelected = computed(() => props.modelValue.includes(props.session.id));
 
 function toggle() {
@@ -37,7 +40,7 @@ function toggle() {
 
 // ── Time formatting ───────────────────────────────────────────────
 function formatTime(iso) {
-  return new Date(iso).toLocaleTimeString("en-US", {
+  return new Date(iso).toLocaleTimeString(locale.value, {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
@@ -179,7 +182,7 @@ const trackStyle = computed(
       class="text-[11px] leading-[14px]"
       :class="[capacityToken.text, isSoldOut ? 'font-semibold' : 'font-medium']"
     >
-      {{ isSoldOut ? "Sold Out" : `${spotsLeft} spots left` }}
+      {{ isSoldOut ? t('sessions.soldOut') : t('sessions.spotsLeft', { count: spotsLeft }) }}
     </p>
   </div>
 </template>

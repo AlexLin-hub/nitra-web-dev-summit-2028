@@ -1,9 +1,11 @@
 <script setup>
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraTicketCard from "../components/NitraTicketCard.vue";
 import NitraTextField from "../components/NitraTextField.vue";
 
+const { t } = useI18n();
 const { state, selectTicket, ticketTypes, validationErrors, touchedSteps, hasMerchandise } =
   useEventRegistration();
 
@@ -16,7 +18,7 @@ const e = computed(() => validationErrors.value.step1);
   <div class="flex flex-col gap-8">
     <!-- Ticket Type selection -->
     <section class="flex flex-col gap-4">
-      <h2 class="text-subtitle1 text-neutral">Select Ticket Type</h2>
+      <h2 class="text-subtitle1 text-neutral">{{ t('attendee.selectTicket') }}</h2>
       <div class="grid grid-cols-3 gap-4">
         <NitraTicketCard
           v-for="ticket in ticketTypes"
@@ -34,23 +36,23 @@ const e = computed(() => validationErrors.value.step1);
 
     <!-- Attendee Information form -->
     <section class="flex flex-col gap-5">
-      <h2 class="text-h3 text-neutral">Attendee Information</h2>
+      <h2 class="text-h3 text-neutral">{{ t('attendee.title') }}</h2>
 
       <!-- Row 1: Full Name + Email -->
       <div class="grid grid-cols-2 gap-6">
         <NitraTextField
           v-model="state.attendeeInfo.fullName"
-          label="Full Name"
-          placeholder="Enter your full name"
+          :label="t('attendee.fullName')"
+          :placeholder="t('attendee.fullNamePlaceholder')"
           required
           :error="showErrors && !!e.fullName"
           :error-message="e.fullName"
         />
         <NitraTextField
           v-model="state.attendeeInfo.email"
-          label="Email"
+          :label="t('attendee.email')"
           type="email"
-          placeholder="Enter your email address"
+          :placeholder="t('attendee.emailPlaceholder')"
           required
           :error="showErrors && !!e.email"
           :error-message="e.email"
@@ -61,17 +63,17 @@ const e = computed(() => validationErrors.value.step1);
       <div class="grid grid-cols-2 gap-6">
         <NitraTextField
           v-model="state.attendeeInfo.phone"
-          label="Phone"
+          :label="t('attendee.phone')"
           type="tel"
-          placeholder="Enter your phone number"
+          :placeholder="t('attendee.phonePlaceholder')"
           required
           :error="showErrors && !!e.phone"
           :error-message="e.phone"
         />
         <NitraTextField
           v-model="state.attendeeInfo.company"
-          label="Company"
-          placeholder="Enter your company name"
+          :label="t('attendee.company')"
+          :placeholder="t('attendee.companyPlaceholder')"
           required
           :error="showErrors && !!e.company"
           :error-message="e.company"
@@ -81,8 +83,8 @@ const e = computed(() => validationErrors.value.step1);
       <!-- Job Title -->
       <NitraTextField
         v-model="state.attendeeInfo.jobTitle"
-        label="Job Title"
-        placeholder="Enter your job title"
+        :label="t('attendee.jobTitle')"
+        :placeholder="t('attendee.jobTitlePlaceholder')"
         required
         :error="showErrors && !!e.jobTitle"
         :error-message="e.jobTitle"
@@ -91,8 +93,8 @@ const e = computed(() => validationErrors.value.step1);
       <!-- Shipping Address — required when merchandise is in the cart -->
       <NitraTextField
         v-model="state.attendeeInfo.shippingAddress"
-        :label="hasMerchandise ? 'Shipping Address' : 'Shipping Address (Optional)'"
-        placeholder="Enter your shipping address"
+        :label="hasMerchandise ? t('attendee.shippingAddressRequired') : t('attendee.shippingAddressOptional')"
+        :placeholder="t('attendee.shippingAddressPlaceholder')"
         :required="hasMerchandise"
         :error="showErrors && !!e.shippingAddress"
         :error-message="e.shippingAddress"
