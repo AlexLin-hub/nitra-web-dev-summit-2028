@@ -45,7 +45,7 @@ function makeInitialState() {
       company: "",
       jobTitle: "",
       shippingAddress: "",
-      ticketType: null, // 'general' | 'vip' | 'student'
+      ticketType: "vip", // 'general' | 'vip' | 'student'
     },
     /** @type {string[]} */
     selectedSessionIds: [],
@@ -59,11 +59,14 @@ function makeInitialState() {
   };
 }
 
+// ── Singleton state (shared across all callers) ───────────────────────────────
+
+/** Single Source of Truth for all form state */
+const state = ref(makeInitialState());
+
 // ── Composable ───────────────────────────────────────────────────────────────
 
 export function useEventRegistration() {
-  /** Single Source of Truth for all form state */
-  const state = ref(makeInitialState());
 
   // ── Derived: sessions ──────────────────────────────────────────────────
 
@@ -363,6 +366,7 @@ export function useEventRegistration() {
     if (!isFormValid.value) return false;
     // Generate order ID like TC2028-47291
     state.value.orderId = `TC2028-${Math.floor(10000 + Math.random() * 90000)}`;
+    console.log("orderId", state.value.orderId);
     state.value.isSubmitted = true;
     return true;
   }
