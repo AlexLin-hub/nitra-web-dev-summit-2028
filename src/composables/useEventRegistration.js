@@ -64,6 +64,13 @@ function makeInitialState() {
 /** Single Source of Truth for all form state */
 const state = ref(makeInitialState());
 
+/**
+ * Tracks which steps the user has explicitly attempted to leave
+ * (i.e. clicked "Next" while on that step). Field-level error messages
+ * in each view are only rendered once the corresponding step is touched.
+ */
+const touchedSteps = ref(new Set());
+
 // ── Composable ───────────────────────────────────────────────────────────────
 
 export function useEventRegistration() {
@@ -296,6 +303,14 @@ export function useEventRegistration() {
 
   // ── Navigation ─────────────────────────────────────────────────────────
 
+  /**
+   * Mark a step as "touched" so field-level errors become visible.
+   * Called by App.vue before advancing to the next step.
+   */
+  function touchStep(step) {
+    touchedSteps.value = new Set([...touchedSteps.value, step]);
+  }
+
   function nextStep() {
     if (state.value.currentStep < TOTAL_STEPS) state.value.currentStep++;
   }
@@ -374,6 +389,7 @@ export function useEventRegistration() {
   /** Reset the entire form to its initial state */
   function reset() {
     state.value = makeInitialState();
+    touchedSteps.value = new Set();
   }
 
   // ── Public API ─────────────────────────────────────────────────────────
@@ -405,11 +421,13 @@ export function useEventRegistration() {
     validationErrors,
     stepsWithErrors,
     isFormValid,
+    touchedSteps,
 
     // Navigation
     nextStep,
     prevStep,
     goToStep,
+    touchStep,
 
     // Actions
     selectTicket,

@@ -57,10 +57,10 @@ const formattedPrice = computed(
     @keydown.enter.prevent="select"
     @keydown.space.prevent="select"
     :class="[
-      'flex flex-col gap-3 rounded-md p-5 transition-all duration-150 outline-none w-full',
+      'flex border-solid flex-col gap-3 rounded-md p-5 transition-all duration-150 outline-none w-full',
       'shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08),0px_1px_3px_0px_rgba(0,0,0,0.04)]',
       isSelected
-        ? 'border-solid border-2 border-brand-emphasis bg-brand-muted-rest cursor-pointer'
+        ? 'border-2 border-brand-emphasis bg-brand-muted-rest cursor-pointer'
         : disabled
           ? 'border border-neutral-muted bg-disable cursor-not-allowed opacity-50'
           : 'border border-neutral-muted bg-surface-l1 cursor-pointer hover:border-brand-muted hover:bg-brand-subtle-hover',
@@ -88,11 +88,7 @@ const formattedPrice = computed(
         :key="perk"
         class="flex items-center gap-2 text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted"
       >
-        <q-icon
-          name="check_circle"
-          size="14px"
-          class="text-neutral shrink-0"
-        />
+        <q-icon name="check_circle" size="14px" class="text-neutral shrink-0" />
         {{ perk }}
       </li>
     </ul>

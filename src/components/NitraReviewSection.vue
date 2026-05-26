@@ -55,7 +55,7 @@ const emit = defineEmits(["edit"]);
 <template>
   <div
     :class="[
-      'flex flex-col rounded-md bg-surface-l1 p-5',
+      'border-solid flex flex-col rounded-md bg-surface-l1 p-5',
       compact ? 'gap-2' : 'gap-3',
       hasError
         ? 'border-2 border-danger-emphasis'
@@ -83,7 +83,7 @@ const emit = defineEmits(["edit"]);
     <!-- Row list -->
     <template v-for="(item, index) in items" :key="index">
       <!-- Optional divider before this row -->
-      <div v-if="item.separator" class="divider-muted border-t" />
+      <div v-if="item.separator" class="border-solid divider-muted border-t" />
 
       <!-- Discount row (11px text-brand-emphasis) -->
       <div
@@ -100,9 +100,7 @@ const emit = defineEmits(["edit"]);
         class="flex items-start justify-between gap-4 text-[length:var(--font-size-sm)] leading-[16px]"
       >
         <span
-          :class="
-            item.bold ? 'text-neutral font-medium' : 'text-neutral-muted'
-          "
+          :class="item.bold ? 'text-neutral font-medium' : 'text-neutral-muted'"
         >
           {{ item.label }}
         </span>
@@ -124,3 +122,15 @@ const emit = defineEmits(["edit"]);
     </template>
   </div>
 </template>
+<style scoped>
+h3 {
+  padding: 0;
+  margin: 0;
+}
+button {
+  outline: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+</style>

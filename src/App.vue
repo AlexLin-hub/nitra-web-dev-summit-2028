@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted, onBeforeUnmount } from "vue";
 import { event } from "./mocks/event.js";
 import { useEventRegistration } from "./composables/useEventRegistration.js";
 import logoUrl from "./assets/images/logo.svg";
@@ -29,34 +29,58 @@ const STEP_VIEWS = {
   4: ReviewSubmit,
 };
 
-const { state, nextStep, prevStep, stepsWithErrors, isFormValid, submit } =
-  useEventRegistration();
+const {
+  state,
+  nextStep,
+  prevStep,
+  goToStep,
+  touchStep,
+  stepsWithErrors,
+  isFormValid,
+  submit,
+} = useEventRegistration();
 
+// Only flag a step as errored once the user has moved past it.
 const stepErrors = computed(() =>
-  [1, 2, 3, 4].map((s) => stepsWithErrors.value.includes(s))
+  [1, 2, 3, 4].map(
+    (s) => state.value.currentStep > s && stepsWithErrors.value.includes(s),
+  ),
 );
 
 const currentView = computed(
-  () => STEP_VIEWS[state.value.currentStep] ?? AttendeeInfo
+  () => STEP_VIEWS[state.value.currentStep] ?? AttendeeInfo,
 );
 const nextLabel = computed(
-  () => NEXT_LABELS[state.value.currentStep] ?? "Next"
+  () => NEXT_LABELS[state.value.currentStep] ?? "Next",
 );
 const hasPrev = computed(() => state.value.currentStep > 1);
 
 const isStep4 = computed(() => state.value.currentStep === 4);
 
 const isSubmitDisabled = computed(
-  () => isStep4.value && (!isFormValid.value || state.value.isSubmitted)
+  () => isStep4.value && (!isFormValid.value || state.value.isSubmitted),
 );
 
 function handleNext() {
+  // Mark the current step as touched so field-level errors become visible.
+  touchStep(state.value.currentStep);
   if (isStep4.value) {
     submit();
   } else {
     nextStep();
   }
 }
+
+// Warn the user before closing/refreshing to prevent data loss.
+function handleBeforeUnload(e) {
+  e.preventDefault();
+  e.returnValue = "";
+}
+
+onMounted(() => window.addEventListener("beforeunload", handleBeforeUnload));
+onBeforeUnmount(() =>
+  window.removeEventListener("beforeunload", handleBeforeUnload),
+);
 </script>
 
 <template>
@@ -73,7 +97,9 @@ function handleNext() {
 
     <!-- ── Success State ────────────────────────────────────── -->
     <template v-if="state.isSubmitted">
-      <main class="flex-1 min-h-0 overflow-y-auto flex items-center justify-center py-[60px]">
+      <main
+        class="flex-1 min-h-0 overflow-y-auto flex items-center justify-center py-[60px]"
+      >
         <RegistrationSuccess />
       </main>
     </template>
@@ -82,13 +108,13 @@ function handleNext() {
     <template v-else>
       <!-- Sticky Stepper -->
       <div
-        class="shrink-0 border-b border-[var(--divider-default)] px-[120px] py-6 bg-surface-l0 z-10"
+        class="border-solid shrink-0 border-b border-[var(--divider-default)] px-[120px] py-6 bg-surface-l0 z-10"
       >
         <NitraStepper
-          :model-value="state.currentStep"
+          v-model="state.currentStep"
           :steps="STEP_LABELS"
           :errors="stepErrors"
-          :clickable="false"
+          :clickable="true"
         />
       </div>
 
@@ -101,7 +127,7 @@ function handleNext() {
 
       <!-- Sticky Footer -->
       <footer
-        class="shrink-0 border-t border-[var(--divider-default)] px-[120px] py-4 bg-surface-l0 flex justify-between items-center z-20"
+        class="border-solid shrink-0 border-t border-[var(--divider-default)] px-[120px] py-4 bg-surface-l0 flex justify-between items-center z-20"
       >
         <NitraButton
           v-if="hasPrev"
