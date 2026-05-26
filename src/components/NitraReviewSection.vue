@@ -81,7 +81,13 @@ const emit = defineEmits(["edit"]);
     </div>
 
     <!-- Row list -->
-    <template v-for="(item, index) in items" :key="index">
+    <div
+      v-if="items.length === 0"
+      class="text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted"
+    >
+      -
+    </div>
+    <template v-else v-for="(item, index) in items" :key="index">
       <!-- Optional divider before this row -->
       <div v-if="item.separator" class="border-solid divider-muted border-t" />
 

@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, onBeforeUnmount } from "vue";
+import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { event } from "./mocks/event.js";
 import { useEventRegistration } from "./composables/useEventRegistration.js";
 import logoUrl from "./assets/images/logo.svg";
@@ -39,6 +39,12 @@ const {
   isFormValid,
   submit,
 } = useEventRegistration();
+
+const mainRef = ref(null);
+watch(
+  () => state.value.currentStep,
+  () => mainRef.value?.scrollTo({ top: 0 }),
+);
 
 // Only flag a step as errored once the user has moved past it.
 const stepErrors = computed(() =>
@@ -119,7 +125,7 @@ onBeforeUnmount(() =>
       </div>
 
       <!-- Scrollable Content -->
-      <main class="flex-1 min-h-0 overflow-y-auto">
+      <main ref="mainRef" class="flex-1 min-h-0 overflow-y-auto">
         <div class="px-[120px] py-10">
           <component :is="currentView" />
         </div>
