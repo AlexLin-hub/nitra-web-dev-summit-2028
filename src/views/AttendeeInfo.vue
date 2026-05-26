@@ -11,7 +11,7 @@ const { state, selectTicket, ticketTypes } = useEventRegistration();
     <!-- Ticket Type selection -->
     <section class="flex flex-col gap-4">
       <h2 class="text-subtitle1 text-neutral">Select Ticket Type</h2>
-      <div class="flex gap-4">
+      <div class="grid grid-cols-3 gap-4">
         <NitraTicketCard
           v-for="ticket in ticketTypes"
           :key="ticket.id"
@@ -31,7 +31,7 @@ const { state, selectTicket, ticketTypes } = useEventRegistration();
       <h2 class="text-h3 text-neutral">Attendee Information</h2>
 
       <!-- Row 1: Full Name + Email -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 gap-6">
         <NitraTextField
           v-model="state.attendeeInfo.fullName"
           label="Full Name"
@@ -48,7 +48,7 @@ const { state, selectTicket, ticketTypes } = useEventRegistration();
       </div>
 
       <!-- Row 2: Phone + Company -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 gap-6">
         <NitraTextField
           v-model="state.attendeeInfo.phone"
           label="Phone"
@@ -75,9 +75,8 @@ const { state, selectTicket, ticketTypes } = useEventRegistration();
       <!-- Shipping Address (Optional) -->
       <NitraTextField
         v-model="state.attendeeInfo.shippingAddress"
-        label="Shipping Address"
+        label="Shipping Address (Optional)"
         placeholder="Enter your shipping address"
-        optional
       />
     </section>
   </div>
