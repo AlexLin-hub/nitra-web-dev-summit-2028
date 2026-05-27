@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from "vue";
+import { useEventRegistration } from "../composables/useEventRegistration.js";
 
 const props = defineProps({
   modelValue: {
@@ -34,6 +35,8 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
+const { formatCurrency } = useEventRegistration();
+
 const isSelected = computed(() => props.modelValue === props.value);
 
 function select() {
@@ -42,9 +45,7 @@ function select() {
   }
 }
 
-const formattedPrice = computed(
-  () => `$${props.price.toLocaleString("en-US")}`,
-);
+const formattedPrice = computed(() => formatCurrency(props.price));
 </script>
 
 <template>

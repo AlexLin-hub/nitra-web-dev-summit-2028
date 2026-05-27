@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 /**
  * modelValue shape:
@@ -52,6 +53,8 @@ const displayName = computed(() => {
   return selectedSize.value ? `${baseName} (${selectedSize.value})` : baseName;
 });
 
+const { t, locale } = useI18n();
+
 // ── Price ─────────────────────────────────────────────────────────
 const effectivePrice = computed(() => {
   if (props.vipDiscount && props.addon.category === "workshop") {
@@ -60,9 +63,13 @@ const effectivePrice = computed(() => {
   return props.addon.price;
 });
 
-const formattedPrice = computed(
-  () => `$${effectivePrice.value.toLocaleString("en-US")}`,
-);
+const formattedPrice = computed(() => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(effectivePrice.value);
+});
 
 // ── Workshop capacity ─────────────────────────────────────────────
 const spotsLeft = computed(() => {
@@ -71,7 +78,7 @@ const spotsLeft = computed(() => {
 });
 
 function formatTime(iso) {
-  return new Date(iso).toLocaleTimeString("en-US", {
+  return new Date(iso).toLocaleTimeString(locale.value, {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
@@ -82,7 +89,7 @@ function formatTime(iso) {
 const timeRange = computed(() => {
   if (!props.addon.date) return null;
   const d = new Date(props.addon.date);
-  const month = d.toLocaleDateString("en-US", {
+  const month = d.toLocaleDateString(locale.value, {
     month: "short",
     day: "numeric",
     timeZone: "UTC",
@@ -167,7 +174,7 @@ function setQuantity(delta) {
         v-if="spotsLeft != null"
         class="text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted"
       >
-        {{ spotsLeft }} spots remaining
+        {{ t("common.spotsRemaining", { count: spotsLeft }) }}
       </p>
     </template>
 
@@ -179,12 +186,12 @@ function setQuantity(delta) {
           <span
             class="text-[length:var(--font-size-sm)] font-medium text-neutral-muted"
           >
-            Size:
+            {{ t("common.size") }}
           </span>
           <q-select
             :model-value="selectedSize"
             :options="addon.sizes"
-            :display-value="selectedSize ? undefined : 'Select'"
+            :display-value="selectedSize ? undefined : t('common.select')"
             dense
             outlined
             :disable="disabled"
@@ -198,7 +205,7 @@ function setQuantity(delta) {
           <span
             class="text-[length:var(--font-size-sm)] font-medium text-neutral-muted"
           >
-            Qty:
+            {{ t("common.qty") }}
           </span>
           <button
             :disabled="disabled || quantity <= 0"
@@ -220,7 +227,7 @@ function setQuantity(delta) {
             <q-icon name="add" size="14px" />
           </button>
           <span class="text-[10px] leading-[14px] text-neutral-quiet">
-            max {{ addon.maxQuantity }}
+            {{ t("common.maxQuantity", { count: addon.maxQuantity }) }}
           </span>
         </div>
       </div>
@@ -232,7 +239,7 @@ function setQuantity(delta) {
         class="inline-flex items-center gap-1 text-[11px] font-semibold leading-[14px] text-success"
       >
         <q-icon name="check" size="12px" />
-        Added to order
+        {{ t("common.added") }}
       </span>
     </div>
   </div>

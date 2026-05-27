@@ -1,10 +1,12 @@
 <script setup>
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { addons } from "../mocks/addons.js";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraAlert from "../components/NitraAlert.vue";
 import NitraReviewSection from "../components/NitraReviewSection.vue";
 
+const { t, locale } = useI18n();
 const {
   state,
   selectedSessions,
@@ -15,26 +17,19 @@ const {
   hasMerchandise,
   goToStep,
   ticketTypes,
+  formatCurrency,
 } = useEventRegistration();
 
 // ── Helpers ───────────────────────────────────────────────────────────
 
-function formatCurrency(amount) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(amount);
-}
-
 function formatSessionDateTime(isoDate) {
   const d = new Date(isoDate);
-  const date = d.toLocaleDateString("en-US", {
+  const date = d.toLocaleDateString(locale.value, {
     month: "short",
     day: "numeric",
     timeZone: "UTC",
   });
-  const time = d.toLocaleTimeString("en-US", {
+  const time = d.toLocaleTimeString(locale.value, {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
@@ -62,8 +57,9 @@ const step1Errors = computed(() => validationErrors.value.step1);
 const hasStep1Error = computed(() => Object.keys(step1Errors.value).length > 0);
 
 const ticketLabel = computed(() => {
-  const t = ticketTypes.find((t) => t.id === state.value.attendeeInfo.ticketType);
-  return t ? `${t.name} ($${t.price})` : "—";
+  const tType = state.value.attendeeInfo.ticketType;
+  const ticket = ticketTypes.find((t) => t.id === tType);
+  return ticket ? `${ticket.name} (${formatCurrency(ticket.price)})` : "—";
 });
 
 const attendeeItems = computed(() => {
@@ -71,32 +67,32 @@ const attendeeItems = computed(() => {
   const e = step1Errors.value;
   const items = [
     {
-      label: "Name",
-      value: info.fullName || "— (required)",
+      label: t("attendee.fullName"),
+      value: info.fullName || `— ${t('common.required')}`,
       danger: !!e.fullName,
     },
     {
-      label: "Email",
-      value: info.email || "— (required)",
+      label: t("attendee.email"),
+      value: info.email || `— ${t('common.required')}`,
       danger: !!e.email,
     },
     {
-      label: "Phone",
-      value: info.phone || "— (required)",
+      label: t("attendee.phone"),
+      value: info.phone || `— ${t('common.required')}`,
       danger: !!e.phone,
     },
     {
-      label: "Company",
-      value: info.company || "— (required)",
+      label: t("attendee.company"),
+      value: info.company || `— ${t('common.required')}`,
       danger: !!e.company,
     },
     {
-      label: "Job Title",
-      value: info.jobTitle || "— (required)",
+      label: t("attendee.jobTitle"),
+      value: info.jobTitle || `— ${t('common.required')}`,
       danger: !!e.jobTitle,
     },
     {
-      label: "Ticket Type",
+      label: t("attendee.selectTicket"),
       value: ticketLabel.value,
       danger: !!e.ticketType,
     },
@@ -104,8 +100,8 @@ const attendeeItems = computed(() => {
 
   if (hasMerchandise.value || info.shippingAddress) {
     items.push({
-      label: "Shipping Address",
-      value: info.shippingAddress || "— (required for merchandise)",
+      label: t("attendee.shippingAddress"),
+      value: info.shippingAddress || `— ${t('errors.shippingRequired')}`,
       danger: !!e.shippingAddress,
     });
   }
@@ -124,11 +120,11 @@ const sessionItems = computed(() =>
 
 // ── Add-ons ───────────────────────────────────────────────────────────
 
-const CATEGORY_LABEL = {
-  workshop: "Workshop",
-  meal: "Meal",
-  merchandise: "Merchandise",
-};
+const categoryLabels = computed(() => ({
+  workshop: t("addons.tabs.workshop"),
+  meal: t("addons.tabs.meal"),
+  merchandise: t("addons.tabs.merchandise"),
+}));
 
 const addonItems = computed(() => {
   const items = [];
@@ -139,9 +135,9 @@ const addonItems = computed(() => {
     const name = addon.name + (opts.size ? ` (${opts.size})` : "");
     const value =
       qty > 1
-        ? `${name} × ${qty} ($${addon.price * qty})`
-        : `${name} ($${addon.price})`;
-    items.push({ label: CATEGORY_LABEL[addon.category] ?? addon.category, value });
+        ? `${name} × ${qty} (${formatCurrency(addon.price * qty)})`
+        : `${name} (${formatCurrency(addon.price)})`;
+    items.push({ label: categoryLabels.value[addon.category] ?? addon.category, value });
   }
   return items;
 });
@@ -164,7 +160,7 @@ const pricingItems = computed(() => {
       });
       const discountAmt = fullSubtotal - item.subtotal;
       items.push({
-        label: "Workshop discount (VIP 10%)",
+        label: t("addons.workshopDiscount"),
         value: `-${formatCurrency(discountAmt)}`,
         discount: true,
       });
@@ -178,7 +174,7 @@ const pricingItems = computed(() => {
   }
 
   items.push({ separator: true });
-  items.push({ label: "Grand Total", value: formattedTotal.value, bold: true });
+  items.push({ label: t("review.grandTotal"), value: formattedTotal.value, bold: true });
 
   return items;
 });
@@ -190,15 +186,15 @@ const pricingItems = computed(() => {
     <NitraAlert
       v-if="hasErrors"
       variant="danger"
-      title="Please fix the following errors before submitting"
+      :title="t('errors.fixErrors')"
       :messages="allErrorMessages"
     />
 
-    <h2 class="text-h3 text-neutral">Review Your Registration</h2>
+    <h2 class="text-h3 text-neutral">{{ t('review.title') }}</h2>
 
     <!-- Attendee Information -->
     <NitraReviewSection
-      title="Attendee Information"
+      :title="t('attendee.title')"
       :step="1"
       :has-error="hasStep1Error"
       :items="attendeeItems"
@@ -207,7 +203,7 @@ const pricingItems = computed(() => {
 
     <!-- Selected Sessions -->
     <NitraReviewSection
-      title="Selected Sessions"
+      :title="t('stepper.sessions')"
       :step="2"
       :items="sessionItems"
       @edit="goToStep"
@@ -215,7 +211,7 @@ const pricingItems = computed(() => {
 
     <!-- Add-ons -->
     <NitraReviewSection
-      title="Add-ons"
+      :title="t('stepper.addons')"
       :step="3"
       :items="addonItems"
       @edit="goToStep"
@@ -223,7 +219,7 @@ const pricingItems = computed(() => {
 
     <!-- Pricing Summary -->
     <NitraReviewSection
-      title="Pricing Summary"
+      :title="t('review.pricingSummary')"
       :compact="true"
       :items="pricingItems"
     />

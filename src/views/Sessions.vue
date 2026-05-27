@@ -1,10 +1,12 @@
 <script setup>
 import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { sessions } from "../mocks/sessions.js";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraTabBar from "../components/NitraTabBar.vue";
 import NitraSessionCard from "../components/NitraSessionCard.vue";
 
+const { t, locale } = useI18n();
 const { state, toggleSession, sessionsByDate, selectedSessions } =
   useEventRegistration();
 
@@ -13,7 +15,7 @@ const { state, toggleSession, sessionsByDate, selectedSessions } =
 const dateKeys = computed(() => [...sessionsByDate.value.keys()]);
 
 function formatDateTab(isoDate) {
-  return new Date(isoDate + "T00:00:00Z").toLocaleDateString("en-US", {
+  return new Date(isoDate + "T00:00:00Z").toLocaleDateString(locale.value, {
     month: "short",
     day: "numeric",
     timeZone: "UTC",
@@ -57,7 +59,7 @@ const selectedCount = computed(() => state.value.selectedSessionIds.length);
 <template>
   <div class="flex flex-col gap-6">
     <!-- Title -->
-    <h2 class="text-h3 text-neutral">Select Sessions</h2>
+    <h2 class="text-h3 text-neutral">{{ t('sessions.title') }}</h2>
 
     <!-- Date tab bar -->
     <NitraTabBar
@@ -71,7 +73,7 @@ const selectedCount = computed(() => state.value.selectedSessionIds.length);
       v-if="selectedCount > 0"
       class="text-[length:var(--font-size-sm)] text-neutral-muted"
     >
-      {{ selectedCount }} session{{ selectedCount === 1 ? "" : "s" }} selected
+      {{ t('common.itemsSelected', { count: selectedCount }) }}
     </p>
 
     <!-- Session grid -->
@@ -91,7 +93,7 @@ const selectedCount = computed(() => state.value.selectedSessionIds.length);
       v-if="currentSessions.length === 0"
       class="text-neutral-muted text-center py-8"
     >
-      No sessions available for this date.
+      {{ t('sessions.noSessions') }}
     </p>
   </div>
 </template>

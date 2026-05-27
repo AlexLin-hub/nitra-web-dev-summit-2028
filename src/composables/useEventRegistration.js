@@ -1,4 +1,5 @@
 import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { event } from "src/mocks/event";
 import { sessions } from "src/mocks/sessions";
 import { addons } from "src/mocks/addons";
@@ -24,15 +25,6 @@ const PHONE_RE = /^\+?[\d\s\-().]{7,20}$/;
  */
 function hasTimeOverlap(aStart, aEnd, bStart, bEnd) {
   return aStart < bEnd && bStart < aEnd;
-}
-
-/** Formats a number as $X,XXX.XX */
-function formatCurrency(amount) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 2,
-  }).format(amount);
 }
 
 function makeInitialState() {
@@ -74,6 +66,16 @@ const touchedSteps = ref(new Set());
 // ── Composable ───────────────────────────────────────────────────────────────
 
 export function useEventRegistration() {
+  const { t, locale } = useI18n();
+
+  /** Formats a number as $X,XXX.XX */
+  function formatCurrency(amount) {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+    }).format(amount);
+  }
 
   // ── Derived: sessions ──────────────────────────────────────────────────
 
@@ -244,45 +246,42 @@ export function useEventRegistration() {
 
     // Step 1 — attendee info
     if (!attendeeInfo.fullName.trim())
-      errors.step1.fullName = "Full name is required.";
+      errors.step1.fullName = t("errors.nameRequired");
 
     if (!attendeeInfo.email.trim()) {
-      errors.step1.email = "Email is required.";
+      errors.step1.email = t("errors.emailRequired");
     } else if (!EMAIL_RE.test(attendeeInfo.email.trim())) {
-      errors.step1.email = "Enter a valid email address.";
+      errors.step1.email = t("errors.emailInvalid");
     }
 
     if (!attendeeInfo.phone.trim()) {
-      errors.step1.phone = "Phone number is required.";
+      errors.step1.phone = t("errors.phoneRequired");
     } else if (!PHONE_RE.test(attendeeInfo.phone.trim())) {
-      errors.step1.phone = "Enter a valid phone number.";
+      errors.step1.phone = t("errors.phoneInvalid");
     }
 
     if (!attendeeInfo.company.trim())
-      errors.step1.company = "Company is required.";
+      errors.step1.company = t("errors.companyRequired");
 
     if (!attendeeInfo.jobTitle.trim())
-      errors.step1.jobTitle = "Job title is required.";
+      errors.step1.jobTitle = t("errors.jobTitleRequired");
 
     if (!attendeeInfo.ticketType)
-      errors.step1.ticketType = "Please select a ticket type.";
+      errors.step1.ticketType = t("errors.ticketRequired");
 
     // Shipping address becomes required when any merchandise is in the cart
     if (hasMerchandise.value && !attendeeInfo.shippingAddress.trim())
-      errors.step1.shippingAddress =
-        "Shipping address is required when merchandise is selected.";
+      errors.step1.shippingAddress = t("errors.shippingRequired");
 
     // Step 2 — session conflicts
     if (sessionConflictIds.value.size > 0)
-      errors.step2.push(
-        "Your session selections have time conflicts. Please resolve them before submitting.",
-      );
+      errors.step2.push(t("errors.sessionConflict"));
 
     // Step 3 — merchandise size selection
     for (const [addonId, opts] of Object.entries(selectedAddons)) {
       const addon = addons.find((a) => a.id === addonId);
       if (addon?.sizes?.length && !opts.size)
-        errors.step3.push(`Please select a size for "${addon.name}".`);
+        errors.step3.push(t("errors.sizeRequired", { name: addon.name }));
     }
 
     return errors;
@@ -381,7 +380,6 @@ export function useEventRegistration() {
     if (!isFormValid.value) return false;
     // Generate order ID like TC2028-47291
     state.value.orderId = `TC2028-${Math.floor(10000 + Math.random() * 90000)}`;
-    console.log("orderId", state.value.orderId);
     state.value.isSubmitted = true;
     return true;
   }
@@ -437,6 +435,9 @@ export function useEventRegistration() {
     toggleAddon,
     submit,
     reset,
+
+    // Helpers
+    formatCurrency,
 
     // Constants (useful for templates)
     TOTAL_STEPS,
