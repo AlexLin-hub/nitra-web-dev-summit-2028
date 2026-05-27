@@ -236,6 +236,14 @@ export function useEventRegistration() {
   // ── Derived: pricing ───────────────────────────────────────────────────
 
   const isVip = computed(() => state.value.attendeeInfo.ticketType === "vip");
+  const isGeneral = computed(
+    () => state.value.attendeeInfo.ticketType === "general",
+  );
+  const lunchIncluded = computed(() => isVip.value || isGeneral.value);
+  const currentTicketName = computed(() => {
+    const { ticketType } = state.value.attendeeInfo;
+    return ticketType ? (TICKET_MAP.value[ticketType]?.name ?? "") : "";
+  });
 
   const ticketPrice = computed(() => {
     const { ticketType } = state.value.attendeeInfo;
@@ -483,6 +491,9 @@ export function useEventRegistration() {
 
     // Derived: ticket
     isVip,
+    isGeneral,
+    lunchIncluded,
+    currentTicketName,
     ticketPrice,
 
     // Derived: pricing
