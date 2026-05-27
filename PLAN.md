@@ -1,32 +1,71 @@
 # Nitra WebDev Summit 2028 - Project Plan
 
-## 1. Implementation Steps
+_Welcome! To see my complete development journey and AI collaboration methodology, please refer to the following documentation files:_
 
-1. **State Management:** Create a global composable to manage step navigation and store form data across all steps for the final review.
-2. **UI Components:** Extract reusable UI components based on the Figma design (naming convention: `Nitra[ComponentName].vue`).
-3. **Step Navigation:** Implement form steps as separate components and use Vue's dynamic `<component :is="...">` to handle step transitions seamlessly while sharing the global state.
-4. **Data Integration:** Integrate the provided mock data to drive the page logic and dynamic rendering.
-5. **Validation:** Implement validation rules for each step before allowing the user to proceed.
-6. **UX Polish:** Refine the user experience, including error states and smooth transitions.
+- [**`DEV_LOG.md`**](./DEV_LOG.md): Chronological development log and problem-solving journey.
+- [**`composable-workflow.md`**](./composable-workflow.md): AI constraints for the state machine.
+- [**`component-workflow.md`**](./component-workflow.md): AI constraints for UI generation.
 
-## 2. Architectural Decisions
+---
 
-- **Composable over Pinia:** I chose a Vue composable for state management to keep the architecture lightweight. It establishes a Single Source of Truth (SSOT) for the form data without the overhead of an external library.
-- **Dynamic Components (`<component :is="...">`):** This approach simplifies step navigation and ensures the component state is easily preserved across steps without requiring a complex Vue Router setup.
-- **Computed Properties:** Strictly used for deriving state (e.g., calculating the total price) to ensure reactivity and prevent data inconsistency caused by manual `watch` updates.
+## 1. Architectural Decisions & Project Overview
 
-## 3. Future Improvements
+This project is an Event Registration Wizard built with **Vue 3.5.17**, **Quasar v2.18.5**, and **UnoCSS**. My primary goal was to deliver a highly maintainable, pixel-perfect multi-step form with a robust state machine.
 
-- Implement the `beforeunload` event listener to warn users and prevent accidental data loss if they try to leave the page in the middle of the form.
+- **Single Source of Truth (SSOT):** Instead of using Pinia, I implemented a global composable (`useEventRegistration.js`). I strictly used `ref` (avoiding `reactive` to prevent reactivity loss during state replacement) to store the payload for all steps.
+- **Derived State:** All calculations (e.g., total prices, VIP discounts, time-conflict detection) are strictly handled via `computed`. I avoided manual `watch` updates to prevent data inconsistency.
+- **Dynamic Components:** Used `<component :is="...">` to handle step transitions seamlessly. This keeps the architecture lightweight without requiring a complex Vue Router setup.
+- **i18n Routing:** Implemented `vue-i18n` with a simple URL parameter approach (`?hl=lang`, defaulting to `en-us`) for scalability.
 
-## 4. Nice to Have (Bonus)
+---
 
-- Integrate `vue-i18n` to support `en-US` and `zh-TW` localizations.
+## 2. AI Collaboration Strategy
 
-## 5. AI Collaboration Log
+_Approximately 90% of the boilerplate and base logic was generated using AI, heavily guided by strict markdown-based constraints._
 
-_(To be updated during the development process...)_
+### Phase 1: Prompt Engineering via Workflow Files
 
-## 6. Challenges & Solutions
+Instead of writing ad-hoc prompts, I engineered specific "Rule Files" to constrain the AI's output. By defining strict boundaries for UnoCSS and Quasar, I prevented styling conflicts.
 
-_(To be updated during the development process...)_
+### Phase 2: Figma MCP Integration
+
+Initially, I faced permission issues with the provided Figma link. I proactively duplicated the design into my personal drafts to unlock Figma Dev Mode. This allowed me to use the **Figma MCP server** with Cursor (`Claude 3.5 Sonnet`), feeding exact design tokens directly into the AI context for component generation.
+
+### Phase 3: i18n Generation via Gemini CLI
+
+To implement internationalization efficiently, I utilized the **Gemini CLI (`gemini-3-flash-preview`)**. I fed the UI text into the model to rapidly generate and structure the localization files (`zh-TW` and `en-US`), eliminating manual translation overhead.
+
+### Phase 4: Human-in-the-Loop Code Review
+
+AI is powerful but imperfect. I conducted a strict manual code review to fix AI hallucinations and polish the UI/UX:
+
+- **CSS Resets:** Manually removed default margins/paddings on `<button>`, `<h3>`, `<p>` tags that the AI missed, ensuring pixel-perfect alignment with Figma.
+- **Design Token Accuracy:** The AI hallucinated some capacity colors. I manually corrected the `capacityToken` logic in `NitraSessionCard.vue` (e.g., `< 0.5`: green, `>= 0.5`: red, `sold out`: warning/default).
+- **Component Alignment:** Fixed icon alignments in `NitraAlert.vue` and corrected the placeholder text and styling in `NitraAddonCard.vue`'s select dropdown.
+
+---
+
+## 3. Product Sense & UX Polish
+
+_Beyond the basic requirements, I implemented several business-driven UX enhancements:_
+
+- **Defensive Programming:** Added a `beforeunload` event listener to prevent users from accidentally losing their data if they try to close the tab mid-registration.
+- **Business Logic Enhancements:**
+  - Set "VIP" as the default ticket selection to drive higher revenue.
+  - Added a dynamic `<NitraAlert/>` in the Add-ons step: If a user selects General/VIP tickets, it reminds them that a lunch box is already included, preventing redundant meal purchases.
+  - Shipping Information validation is dynamically triggered _only_ if the user purchases merchandise.
+- **Form Validation & Navigation:**
+  - Users can freely click the `<NitraStepper/>` to jump between steps for quick edits.
+  - Error states and validation messages are only triggered _after_ the user attempts to click "Next" or "input blur" or passes the step, preventing premature error flashing.
+  - Synchronized disabled states for sessions and workshops to prevent time-conflict selections in real-time.
+  - Auto-selected the first available product size when a user checks a merchandise item.
+
+---
+
+## 4. Future Improvements
+
+Given more time, I would elevate the project further by:
+
+1. **Testing:** Implementing comprehensive unit tests using **Vitest** to cover the time-conflict algorithms and price calculation logic in the composable.
+2. **Backend Integration:** Deploying to Firebase Hosting and integrating Firestore for real-time ticket inventory management and automated confirmation emails.
+3. **Responsive Web Design (RWD):** Further optimizing the mobile layout for smaller viewports.
