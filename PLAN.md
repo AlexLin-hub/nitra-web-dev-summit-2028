@@ -15,7 +15,7 @@ This project is an Event Registration Wizard built with **Vue 3.5.17**, **Quasar
 - **Single Source of Truth (SSOT):** Instead of using Pinia, I implemented a global composable (`useEventRegistration.js`). I strictly used `ref` (avoiding `reactive` to prevent reactivity loss during state replacement) to store the payload for all steps.
 - **Derived State:** All calculations (e.g., total prices, VIP discounts, time-conflict detection) are strictly handled via `computed`. I avoided manual `watch` updates to prevent data inconsistency.
 - **Dynamic Components:** Used `<component :is="...">` to handle step transitions seamlessly. This keeps the architecture lightweight without requiring a complex Vue Router setup.
-- **i18n Routing:** Implemented `vue-i18n` with a simple URL parameter approach (`?hl=lang`, defaulting to `en-us`) for scalability.
+- **i18n Routing:** Implemented `vue-i18n` with support for a URL parameter (`?hl=lang`), defaulting to the browser's language/local language, and falling back to `en-us` for scalability.
 
 ---
 
