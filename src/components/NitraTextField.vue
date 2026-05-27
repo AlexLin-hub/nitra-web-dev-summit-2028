@@ -46,7 +46,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "blur"]);
 
 const isFocused = ref(false);
 </script>
@@ -86,10 +86,10 @@ const isFocused = ref(false);
         hide-bottom-space
         no-error-icon
         class="w-full"
-        input-class="text-[length:var(--font-size-lg)] text-neutral placeholder-text-neutral-quiet py-2.5"
+        input-class="text-[length:var(--font-size-lg)] text-neutral placeholder:text-neutral-quiet py-2.5"
         @update:model-value="emit('update:modelValue', $event)"
         @focus="isFocused = true"
-        @blur="isFocused = false"
+        @blur="() => { isFocused = false; emit('blur'); }"
       />
     </div>
 

@@ -7,6 +7,7 @@ export default {
     required: '(required)',
     select: 'Select',
     added: 'Added to order',
+    selected: 'Selected',
     spotsRemaining: '{count} spots remaining',
     maxQuantity: 'max {count}',
     itemsSelected: '{count} session | {count} sessions selected',
@@ -83,6 +84,7 @@ export default {
   review: {
     title: 'Review Your Registration',
     edit: 'Edit → Step {step}',
+    ticketLabel: '{name} Ticket',
     pricingSummary: 'Pricing Summary',
     grandTotal: 'Grand Total',
   },

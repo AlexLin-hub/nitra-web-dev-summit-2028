@@ -94,7 +94,7 @@ const { t } = useI18n();
       <!-- Optional divider before this row -->
       <div
         v-if="item.separator"
-        class="border-0 border-solid border-solid divider-muted border-t"
+        class="border-t border-0 border-solid divider-muted"
       />
 
       <!-- Discount row (11px text-brand-emphasis) -->

@@ -24,7 +24,7 @@ const ticketName = computed(() => {
   <div class="flex flex-col items-center gap-4 text-center">
     <!-- Success icon -->
     <div
-      class="w-20 h-20 rounded-full bg-[#11925c] flex items-center justify-center shrink-0"
+      class="w-20 h-20 rounded-full bg-success-bold-rest flex items-center justify-center shrink-0"
     >
       <q-icon name="check" size="40px" class="text-inverse" />
     </div>
