@@ -1,33 +1,32 @@
-import UnoCSS from 'unocss/vite'
+import UnoCSS from "unocss/vite";
 
 export default function () {
   return {
-    boot: ['unocss', 'i18n'],
+    boot: ["unocss", "i18n"],
 
-    css: ['app.scss'],
+    css: ["app.scss"],
 
-    extras: ['material-icons'],
+    extras: ["material-icons"],
 
     build: {
       target: {
-        browser: ['es2022', 'firefox115', 'chrome115', 'safari14'],
+        browser: ["es2022", "firefox115", "chrome115", "safari14"],
       },
       extendViteConf(viteConf) {
         viteConf.plugins = viteConf.plugins || [];
-        viteConf.plugins.push(
-          ...UnoCSS(),
-        );
+        viteConf.plugins.push(...UnoCSS());
       },
+      publicPath: "/nitra-web-dev-summit-2028/",
     },
 
     devServer: {
       open: true,
-      port: 9001
+      port: 9001,
     },
 
     framework: {
       config: {},
       plugins: [],
     },
-  }
+  };
 }
