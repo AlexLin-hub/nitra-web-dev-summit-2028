@@ -35,6 +35,17 @@ const currentAddons = computed(
   () => addonsByCategory.value.get(activeCategory.value) ?? [],
 );
 
+// ── Conflict alert logic ─────────────────────────────────────────────
+
+const workshopAddons = computed(
+  () => addonsByCategory.value.get("workshop") ?? [],
+);
+
+const noWorkshopsAvailable = computed(() => {
+  if (workshopAddons.value.length === 0) return false;
+  return workshopAddons.value.every((addon) => isAddonDisabled(addon));
+});
+
 // ── Disabled logic ────────────────────────────────────────────────────
 
 function isAddonDisabled(addon) {
@@ -122,6 +133,14 @@ const summaryItems = computed(() => {
         variant="info"
         :title="t('addons.vipLunchTitle')"
         :message="t('addons.vipLunchMsg')"
+      />
+
+      <!-- Workshop conflict notice (when all workshops are blocked by session selections or sold out) -->
+      <NitraAlert
+        v-if="activeCategory === 'workshop' && noWorkshopsAvailable"
+        variant="info"
+        :title="t('addons.workshopConflictTitle')"
+        :message="t('addons.workshopConflictMsg')"
       />
 
       <!-- Addon cards -->

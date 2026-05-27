@@ -6,8 +6,13 @@ import NitraTabBar from "../components/NitraTabBar.vue";
 import NitraSessionCard from "../components/NitraSessionCard.vue";
 
 const { t, locale } = useI18n();
-const { state, toggleSession, sessionsByDate, selectedSessions } =
-  useEventRegistration();
+const {
+  state,
+  toggleSession,
+  sessionsByDate,
+  selectedSessions,
+  sessionWorkshopConflictIds,
+} = useEventRegistration();
 
 // ── Date tabs ─────────────────────────────────────────────────────
 
@@ -49,13 +54,18 @@ function isDisabled(session) {
   const soldOut = session.registered >= session.capacity;
   const selected = state.value.selectedSessionIds.includes(session.id);
   if (soldOut && !selected) return true;
-  // Block unselected sessions that conflict with an already-selected one
-  return (
-    !selected &&
-    selectedSessions.value.some(
-      (sel) => sel.id !== session.id && overlaps(session, sel),
-    )
+  if (selected) return false;
+
+  // Block sessions that conflict with an already-selected session
+  const hasSessionConflict = selectedSessions.value.some(
+    (sel) => sel.id !== session.id && overlaps(session, sel),
   );
+  if (hasSessionConflict) return true;
+
+  // Block sessions that conflict with an already-selected workshop
+  if (sessionWorkshopConflictIds.value.has(session.id)) return true;
+
+  return false;
 }
 
 // ── Count ─────────────────────────────────────────────────────────

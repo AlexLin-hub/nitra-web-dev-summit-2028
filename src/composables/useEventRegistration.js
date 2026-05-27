@@ -193,6 +193,38 @@ export function useEventRegistration() {
     return conflicting;
   });
 
+  /** Full workshop objects that are currently selected */
+  const selectedWorkshops = computed(() =>
+    addons.value.filter(
+      (a) => a.category === "workshop" && state.value.selectedAddons[a.id],
+    ),
+  );
+
+  /**
+   * Set of session IDs that overlap with at least one selected workshop.
+   * These should be shown as unavailable in the UI.
+   */
+  const sessionWorkshopConflictIds = computed(() => {
+    const selected = selectedWorkshops.value;
+    const conflicting = new Set();
+    for (const session of sessions.value) {
+      for (const workshop of selected) {
+        if (
+          hasTimeOverlap(
+            new Date(session.date).getTime(),
+            new Date(session.endDate).getTime(),
+            new Date(workshop.date).getTime(),
+            new Date(workshop.endDate).getTime(),
+          )
+        ) {
+          conflicting.add(session.id);
+          break;
+        }
+      }
+    }
+    return conflicting;
+  });
+
   /** True when at least one merchandise item is in the cart */
   const hasMerchandise = computed(() =>
     Object.keys(state.value.selectedAddons).some((id) => {
@@ -446,6 +478,7 @@ export function useEventRegistration() {
     // Derived: add-ons
     addonsByCategory,
     workshopConflictIds,
+    sessionWorkshopConflictIds,
     hasMerchandise,
 
     // Derived: ticket

@@ -77,6 +77,8 @@ export default {
     orderSummary: '訂單摘要',
     total: '總計',
     workshopDiscount: '工作坊優惠（VIP 9 折）',
+    workshopConflictTitle: '工作坊暫不可選',
+    workshopConflictMsg: '目前所有工作坊皆因名額已滿或與您已選擇的議程時間衝突而無法選擇。',
   },
   review: {
     title: '確認報名資訊',
