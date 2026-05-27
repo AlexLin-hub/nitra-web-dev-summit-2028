@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraTicketCard from "../components/NitraTicketCard.vue";
@@ -9,9 +9,21 @@ const { t } = useI18n();
 const { state, selectTicket, ticketTypes, validationErrors, touchedSteps, hasMerchandise } =
   useEventRegistration();
 
-// Field-level errors only become visible after the user has clicked "Next" on step 1.
-const showErrors = computed(() => touchedSteps.value.has(1));
 const e = computed(() => validationErrors.value.step1);
+
+// True when the user has left step 1 entirely (clicked Next or navigated away).
+const stepLeft = computed(() => state.value.currentStep !== 1 || touchedSteps.value.has(1));
+
+// Track which individual fields have been blurred at least once.
+const blurred = ref({});
+function markBlurred(field) {
+  blurred.value[field] = true;
+}
+
+// A field shows its error when the step is no longer active OR the field has been blurred.
+function showError(field) {
+  return (stepLeft.value || !!blurred.value[field]) && !!e.value[field];
+}
 </script>
 
 <template>
@@ -45,8 +57,9 @@ const e = computed(() => validationErrors.value.step1);
           :label="t('attendee.fullName')"
           :placeholder="t('attendee.fullNamePlaceholder')"
           required
-          :error="showErrors && !!e.fullName"
+          :error="showError('fullName')"
           :error-message="e.fullName"
+          @blur="markBlurred('fullName')"
         />
         <NitraTextField
           v-model="state.attendeeInfo.email"
@@ -54,8 +67,9 @@ const e = computed(() => validationErrors.value.step1);
           type="email"
           :placeholder="t('attendee.emailPlaceholder')"
           required
-          :error="showErrors && !!e.email"
+          :error="showError('email')"
           :error-message="e.email"
+          @blur="markBlurred('email')"
         />
       </div>
 
@@ -67,16 +81,18 @@ const e = computed(() => validationErrors.value.step1);
           type="tel"
           :placeholder="t('attendee.phonePlaceholder')"
           required
-          :error="showErrors && !!e.phone"
+          :error="showError('phone')"
           :error-message="e.phone"
+          @blur="markBlurred('phone')"
         />
         <NitraTextField
           v-model="state.attendeeInfo.company"
           :label="t('attendee.company')"
           :placeholder="t('attendee.companyPlaceholder')"
           required
-          :error="showErrors && !!e.company"
+          :error="showError('company')"
           :error-message="e.company"
+          @blur="markBlurred('company')"
         />
       </div>
 
@@ -86,8 +102,9 @@ const e = computed(() => validationErrors.value.step1);
         :label="t('attendee.jobTitle')"
         :placeholder="t('attendee.jobTitlePlaceholder')"
         required
-        :error="showErrors && !!e.jobTitle"
+        :error="showError('jobTitle')"
         :error-message="e.jobTitle"
+        @blur="markBlurred('jobTitle')"
       />
 
       <!-- Shipping Address — required when merchandise is in the cart -->
@@ -96,8 +113,9 @@ const e = computed(() => validationErrors.value.step1);
         :label="hasMerchandise ? t('attendee.shippingAddressRequired') : t('attendee.shippingAddressOptional')"
         :placeholder="t('attendee.shippingAddressPlaceholder')"
         :required="hasMerchandise"
-        :error="showErrors && !!e.shippingAddress"
+        :error="showError('shippingAddress')"
         :error-message="e.shippingAddress"
+        @blur="markBlurred('shippingAddress')"
       />
     </section>
   </div>

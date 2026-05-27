@@ -101,7 +101,7 @@ const selectedCount = computed(() => state.value.selectedSessionIds.length);
         :model-value="state.selectedSessionIds"
         :session="session"
         :disabled="isDisabled(session)"
-        @update:model-value="() => toggleSession(session.id)"
+        @update:model-value="toggleSession(session.id)"
       />
     </div>
 

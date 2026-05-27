@@ -110,7 +110,7 @@ onBeforeUnmount(() =>
   <div class="h-screen bg-surface-l0 flex flex-col overflow-hidden">
     <!-- ── Sticky Header ────────────────────────────────────── -->
     <header
-      class="shrink-0 border-0 border-solid border-b border-[var(--divider-default)] px-12 py-4 bg-surface-l0 z-20"
+      class="shrink-0 border-0 border-solid border-b divider-default px-12 py-4 bg-surface-l0 z-20"
     >
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -158,13 +158,14 @@ onBeforeUnmount(() =>
     <template v-else>
       <!-- Sticky Stepper -->
       <div
-        class="border-0 border-solid shrink-0 border-b border-[var(--divider-default)] px-[120px] py-6 bg-surface-l0 z-10"
+        class="border-0 border-solid shrink-0 border-b divider-default px-[120px] py-6 bg-surface-l0 z-10"
       >
         <NitraStepper
-          v-model="state.currentStep"
+          :model-value="state.currentStep"
           :steps="STEP_LABELS"
           :errors="stepErrors"
           :clickable="true"
+          @update:model-value="(step) => { touchStep(state.currentStep); goToStep(step); }"
         />
       </div>
 
@@ -177,7 +178,7 @@ onBeforeUnmount(() =>
 
       <!-- Sticky Footer -->
       <footer
-        class="border-0 border-solid shrink-0 border-t border-[var(--divider-default)] px-[120px] py-4 bg-surface-l0 flex justify-between items-center z-20"
+        class="border-0 border-solid shrink-0 border-t divider-default px-[120px] py-4 bg-surface-l0 flex justify-between items-center z-20"
       >
         <NitraButton
           v-if="hasPrev"

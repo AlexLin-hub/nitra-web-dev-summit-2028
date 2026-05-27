@@ -1,8 +1,6 @@
 <script setup>
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { useEventRegistration } from "../composables/useEventRegistration.js";
-
 const props = defineProps({
   modelValue: {
     type: String,
@@ -37,7 +35,14 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 
 const { t } = useI18n();
-const { formatCurrency } = useEventRegistration();
+
+function formatCurrency(amount) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+  }).format(amount);
+}
 
 const isSelected = computed(() => props.modelValue === props.value);
 

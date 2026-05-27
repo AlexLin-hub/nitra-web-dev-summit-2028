@@ -13,6 +13,7 @@ const {
   addons,
   addonsByCategory,
   workshopConflictIds,
+  hasMerchandise,
   isVip,
   updateAddon,
   removeAddon,
@@ -119,9 +120,9 @@ const summaryItems = computed(() => {
         @update:model-value="activeCategory = $event"
       />
 
-      <!-- Shipping info banner (merchandise only) -->
+      <!-- Shipping info banner — shown whenever merch is in the cart -->
       <NitraAlert
-        v-if="activeCategory === 'merchandise'"
+        v-if="activeCategory === 'merchandise' && hasMerchandise"
         variant="info"
         :title="t('addons.shippingNoticeTitle')"
         :message="t('addons.shippingNoticeMsg')"
