@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "quasar dev",
-    "build": "quasar build"
+    "build": "quasar build",
+    "deploy": "yarn build && npx gh-pages -d dist/spa"
   },
   "dependencies": {
     "@quasar/extras": "1.17.0",
