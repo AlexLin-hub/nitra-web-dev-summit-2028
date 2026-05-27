@@ -24,6 +24,8 @@ This log documents the chronological development journey and the human-AI collab
 9. **i18n Implementation:** Utilized `Gemini CLI (gemini-3-flash-preview)` to rapidly generate the `zh-TW` and `en-US` localization files based on the UI text.
 10. **Business Logic Adjustment:** Moved the "Shipping Information" validation/display logic to trigger _only_ when the "Merchandise" tab is interacted with.
 
-## Phase 5: Final Review
+## Phase 5: Final Review & Responsive Web Design (RWD)
 
 11. **Code Quality Check:** Performed a final code review using Antfu's skills conventions (specifically `/unocss` and `/vue`) to ensure enterprise-grade code cleanliness.
+12. **Responsive Web Design (RWD) Implementation:** Designed and executed a comprehensive mobile, tablet, and desktop responsive layout. Solved utility class cascading issues in UnoCSS using `<style scoped>` paired with `@screen` directives, ensuring robust adaptive rendering across viewports (such as the ticket selector collapsing from 3 columns to 1 column, session grids from 2 to 1, stepper labels gracefully hiding, and the sticky add-on order summary correctly wrapping).
+

@@ -110,17 +110,17 @@ onBeforeUnmount(() =>
   <div class="h-screen bg-surface-l0 flex flex-col overflow-hidden">
     <!-- ── Sticky Header ────────────────────────────────────── -->
     <header
-      class="shrink-0 border-0 border-solid border-b divider-default px-12 py-4 bg-surface-l0 z-20"
+      class="shrink-0 border-0 border-solid border-b divider-default px-4 sm:px-8 lg:px-12 py-4 bg-surface-l0 z-20"
     >
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <img :src="logoUrl" alt="Logo" class="w-10 h-10 rounded-lg" />
-          <span class="text-h4 text-neutral">{{ event.name }}</span>
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+          <img :src="logoUrl" alt="Logo" class="w-10 h-10 rounded-lg shrink-0" />
+          <span class="text-subtitle1 sm:text-h4 text-neutral truncate">{{ event.name }}</span>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1 shrink-0">
           <button
-            class="text-[13px] font-medium px-3 py-1.5 rounded-md transition-colors"
+            class="lang-btn font-medium rounded-md transition-colors"
             :class="
               locale === 'zh-tw'
                 ? 'bg-brand-emphasis-rest text-inverse'
@@ -128,10 +128,11 @@ onBeforeUnmount(() =>
             "
             @click="setLanguage('zh-tw')"
           >
-            繁體中文
+            <span class="lang-short">繁中</span>
+            <span class="lang-full">繁體中文</span>
           </button>
           <button
-            class="text-[13px] font-medium px-3 py-1.5 rounded-md transition-colors"
+            class="lang-btn font-medium rounded-md transition-colors"
             :class="
               locale === 'en-us'
                 ? 'bg-brand-emphasis-rest text-inverse'
@@ -139,7 +140,8 @@ onBeforeUnmount(() =>
             "
             @click="setLanguage('en-us')"
           >
-            English
+            <span class="lang-short">EN</span>
+            <span class="lang-full">English</span>
           </button>
         </div>
       </div>
@@ -158,7 +160,7 @@ onBeforeUnmount(() =>
     <template v-else>
       <!-- Sticky Stepper -->
       <div
-        class="border-0 border-solid shrink-0 border-b divider-default px-[120px] py-6 bg-surface-l0 z-10"
+        class="border-0 border-solid shrink-0 border-b divider-default px-4 sm:px-8 lg:px-[120px] py-4 sm:py-6 bg-surface-l0 z-10"
       >
         <NitraStepper
           :model-value="state.currentStep"
@@ -171,14 +173,14 @@ onBeforeUnmount(() =>
 
       <!-- Scrollable Content -->
       <main ref="mainRef" class="flex-1 min-h-0 overflow-y-auto">
-        <div class="px-[120px] py-10">
+        <div class="px-4 sm:px-8 lg:px-[120px] py-6 sm:py-10">
           <component :is="currentView" />
         </div>
       </main>
 
       <!-- Sticky Footer -->
       <footer
-        class="border-0 border-solid shrink-0 border-t divider-default px-[120px] py-4 bg-surface-l0 flex justify-between items-center z-20"
+        class="border-0 border-solid shrink-0 border-t divider-default px-4 sm:px-8 lg:px-[120px] py-4 bg-surface-l0 flex justify-between items-center z-20"
       >
         <NitraButton
           v-if="hasPrev"
@@ -197,3 +199,33 @@ onBeforeUnmount(() =>
     </template>
   </div>
 </template>
+
+<style scoped>
+.lang-btn {
+  font-size: 12px;
+  padding: 6px 8px;
+}
+
+.lang-full {
+  display: none;
+}
+
+.lang-short {
+  display: inline;
+}
+
+@screen sm {
+  .lang-btn {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .lang-full {
+    display: inline;
+  }
+
+  .lang-short {
+    display: none;
+  }
+}
+</style>
