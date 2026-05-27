@@ -25,13 +25,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  /**
-   * VIP discount applies 10% off workshop prices.
-   */
-  vipDiscount: {
-    type: Boolean,
-    default: false,
-  },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -56,19 +49,12 @@ const displayName = computed(() => {
 const { t, locale } = useI18n();
 
 // ── Price ─────────────────────────────────────────────────────────
-const effectivePrice = computed(() => {
-  if (props.vipDiscount && props.addon.category === "workshop") {
-    return props.addon.price * 0.9;
-  }
-  return props.addon.price;
-});
-
 const formattedPrice = computed(() => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,
-  }).format(effectivePrice.value);
+  }).format(props.addon.price);
 });
 
 // ── Workshop capacity ─────────────────────────────────────────────

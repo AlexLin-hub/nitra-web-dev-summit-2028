@@ -131,7 +131,6 @@ const summaryItems = computed(() => {
         :addon="addon"
         :model-value="state.selectedAddons[addon.id] ?? null"
         :disabled="isAddonDisabled(addon)"
-        :vip-discount="isVip"
         @update:model-value="handleAddonUpdate(addon.id, $event)"
       />
     </div>
