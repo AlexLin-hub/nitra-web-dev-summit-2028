@@ -52,10 +52,12 @@ _Beyond the basic requirements, I implemented several business-driven UX enhance
 - **Defensive Programming:** Added a `beforeunload` event listener to prevent users from accidentally losing their data if they try to close the tab mid-registration.
 - **Business Logic Enhancements:**
   - Set "VIP" as the default ticket selection to drive higher revenue.
-  - Added a dynamic `<NitraAlert/>` in the Add-ons step: If a user selects General/VIP tickets, it reminds them that a lunch box is already included, preventing redundant meal purchases.
+  - Unified and localized the lunch-included notification block in the Add-ons step using i18n parameter interpolation: When a user chooses a General or VIP ticket, it dynamically displays a `<NitraAlert/>` reminding them that their specific ticket type (e.g., `{ticketName}`) already includes a two-day lunch, preventing accidental/redundant meal purchases.
+  - Added a user-friendly `<NitraAlert/>` inline informational hint in the Sessions selection step when no sessions are selected yet, clarifying that session registration is optional and they can also decide on-site, thereby reducing registration friction.
   - Shipping Information validation is dynamically triggered _only_ if the user purchases merchandise.
-- **Form Validation & Navigation:**
+- **Form Validation & Navigation & Layout Polish:**
   - Users can freely click the `<NitraStepper/>` to jump between steps for quick edits.
+  - Implemented a `sticky` order summary sidebar in the Add-ons page, ensuring that the total price and selected items remain visible and interactive as users scroll down a long list of workshops, meals, and merchandise, drastically boosting the checkout/review UX.
   - Error states and validation messages are only triggered _after_ the user attempts to click "Next" or "input blur" or passes the step, preventing premature error flashing.
   - Synchronized disabled states for sessions and workshops to prevent time-conflict selections in real-time.
   - Auto-selected the first available product size when a user checks a merchandise item.
