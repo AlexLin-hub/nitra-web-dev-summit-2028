@@ -14,7 +14,8 @@ const {
   addonsByCategory,
   workshopConflictIds,
   hasMerchandise,
-  isVip,
+  lunchIncluded,
+  currentTicketName,
   updateAddon,
   removeAddon,
   formattedTotal,
@@ -128,12 +129,12 @@ const summaryItems = computed(() => {
         :message="t('addons.shippingNoticeMsg')"
       />
 
-      <!-- VIP lunch-included notice (meal packages only) -->
+      <!-- Lunch-included notice (meal packages only, for General & VIP tickets) -->
       <NitraAlert
-        v-if="activeCategory === 'meal' && isVip"
+        v-if="activeCategory === 'meal' && lunchIncluded"
         variant="info"
-        :title="t('addons.vipLunchTitle')"
-        :message="t('addons.vipLunchMsg')"
+        :title="t('addons.lunchIncludedTitle')"
+        :message="t('addons.lunchIncludedMsg', { ticketName: currentTicketName })"
       />
 
       <!-- Workshop conflict notice (when all workshops are blocked by session selections or sold out) -->
