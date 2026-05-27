@@ -63,7 +63,10 @@ const config = computed(() =>
 </script>
 
 <template>
-  <div :role="config.role" :class="['flex items-center p-4', config.container]">
+  <div
+    :role="config.role"
+    :class="['flex flex-nowrap items-start p-4', config.container]"
+  >
     <!-- Icon (info only) -->
     <q-icon
       v-if="config.showIcon"

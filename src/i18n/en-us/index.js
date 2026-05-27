@@ -77,6 +77,8 @@ export default {
     orderSummary: 'Order Summary',
     total: 'Total',
     workshopDiscount: 'Workshop discount (VIP 10%)',
+    workshopConflictTitle: 'Workshops Unavailable',
+    workshopConflictMsg: 'All workshops are currently unavailable due to being sold out or conflicting with your selected sessions.',
   },
   review: {
     title: 'Review Your Registration',

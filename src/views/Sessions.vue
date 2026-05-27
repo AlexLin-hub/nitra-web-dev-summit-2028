@@ -1,14 +1,18 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { sessions } from "../mocks/sessions.js";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraTabBar from "../components/NitraTabBar.vue";
 import NitraSessionCard from "../components/NitraSessionCard.vue";
 
 const { t, locale } = useI18n();
-const { state, toggleSession, sessionsByDate, selectedSessions } =
-  useEventRegistration();
+const {
+  state,
+  toggleSession,
+  sessionsByDate,
+  selectedSessions,
+  sessionWorkshopConflictIds,
+} = useEventRegistration();
 
 // ── Date tabs ─────────────────────────────────────────────────────
 
@@ -27,7 +31,9 @@ const tabs = computed(() =>
 );
 
 const activeDate = ref(null);
-const activeDateKey = computed(() => activeDate.value ?? dateKeys.value[0] ?? null);
+const activeDateKey = computed(
+  () => activeDate.value ?? dateKeys.value[0] ?? null,
+);
 
 // ── Sessions for active date ──────────────────────────────────────
 
@@ -38,17 +44,28 @@ const currentSessions = computed(
 // ── Disabled logic ───────────────────────────────────────────────
 
 function overlaps(a, b) {
-  return new Date(a.date) < new Date(b.endDate) && new Date(b.date) < new Date(a.endDate);
+  return (
+    new Date(a.date) < new Date(b.endDate) &&
+    new Date(b.date) < new Date(a.endDate)
+  );
 }
 
 function isDisabled(session) {
   const soldOut = session.registered >= session.capacity;
   const selected = state.value.selectedSessionIds.includes(session.id);
   if (soldOut && !selected) return true;
-  // Block unselected sessions that conflict with an already-selected one
-  return !selected && selectedSessions.value.some(
+  if (selected) return false;
+
+  // Block sessions that conflict with an already-selected session
+  const hasSessionConflict = selectedSessions.value.some(
     (sel) => sel.id !== session.id && overlaps(session, sel),
   );
+  if (hasSessionConflict) return true;
+
+  // Block sessions that conflict with an already-selected workshop
+  if (sessionWorkshopConflictIds.value.has(session.id)) return true;
+
+  return false;
 }
 
 // ── Count ─────────────────────────────────────────────────────────
@@ -59,7 +76,7 @@ const selectedCount = computed(() => state.value.selectedSessionIds.length);
 <template>
   <div class="flex flex-col gap-6">
     <!-- Title -->
-    <h2 class="text-h3 text-neutral">{{ t('sessions.title') }}</h2>
+    <h2 class="text-h3 text-neutral">{{ t("sessions.title") }}</h2>
 
     <!-- Date tab bar -->
     <NitraTabBar
@@ -73,7 +90,7 @@ const selectedCount = computed(() => state.value.selectedSessionIds.length);
       v-if="selectedCount > 0"
       class="text-[length:var(--font-size-sm)] text-neutral-muted"
     >
-      {{ t('common.itemsSelected', { count: selectedCount }) }}
+      {{ t("common.itemsSelected", { count: selectedCount }) }}
     </p>
 
     <!-- Session grid -->
@@ -93,7 +110,7 @@ const selectedCount = computed(() => state.value.selectedSessionIds.length);
       v-if="currentSessions.length === 0"
       class="text-neutral-muted text-center py-8"
     >
-      {{ t('sessions.noSessions') }}
+      {{ t("sessions.noSessions") }}
     </p>
   </div>
 </template>

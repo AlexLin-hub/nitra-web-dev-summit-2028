@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { addons } from "../mocks/addons.js";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraAlert from "../components/NitraAlert.vue";
 import NitraReviewSection from "../components/NitraReviewSection.vue";
@@ -9,6 +8,8 @@ import NitraReviewSection from "../components/NitraReviewSection.vue";
 const { t, locale } = useI18n();
 const {
   state,
+  event,
+  addons,
   selectedSessions,
   orderItems,
   formattedTotal,
@@ -58,7 +59,7 @@ const hasStep1Error = computed(() => Object.keys(step1Errors.value).length > 0);
 
 const ticketLabel = computed(() => {
   const tType = state.value.attendeeInfo.ticketType;
-  const ticket = ticketTypes.find((t) => t.id === tType);
+  const ticket = ticketTypes.value.find((t) => t.id === tType);
   return ticket ? `${ticket.name} (${formatCurrency(ticket.price)})` : "—";
 });
 
@@ -68,27 +69,27 @@ const attendeeItems = computed(() => {
   const items = [
     {
       label: t("attendee.fullName"),
-      value: info.fullName || `— ${t('common.required')}`,
+      value: info.fullName || `— ${t("common.required")}`,
       danger: !!e.fullName,
     },
     {
       label: t("attendee.email"),
-      value: info.email || `— ${t('common.required')}`,
+      value: info.email || `— ${t("common.required")}`,
       danger: !!e.email,
     },
     {
       label: t("attendee.phone"),
-      value: info.phone || `— ${t('common.required')}`,
+      value: info.phone || `— ${t("common.required")}`,
       danger: !!e.phone,
     },
     {
       label: t("attendee.company"),
-      value: info.company || `— ${t('common.required')}`,
+      value: info.company || `— ${t("common.required")}`,
       danger: !!e.company,
     },
     {
       label: t("attendee.jobTitle"),
-      value: info.jobTitle || `— ${t('common.required')}`,
+      value: info.jobTitle || `— ${t("common.required")}`,
       danger: !!e.jobTitle,
     },
     {
@@ -101,7 +102,7 @@ const attendeeItems = computed(() => {
   if (hasMerchandise.value || info.shippingAddress) {
     items.push({
       label: t("attendee.shippingAddress"),
-      value: info.shippingAddress || `— ${t('errors.shippingRequired')}`,
+      value: info.shippingAddress || `— ${t("errors.shippingRequired")}`,
       danger: !!e.shippingAddress,
     });
   }
@@ -115,7 +116,7 @@ const sessionItems = computed(() =>
   selectedSessions.value.map((s) => ({
     label: formatSessionDateTime(s.date),
     value: s.title,
-  }))
+  })),
 );
 
 // ── Add-ons ───────────────────────────────────────────────────────────
@@ -129,15 +130,23 @@ const categoryLabels = computed(() => ({
 const addonItems = computed(() => {
   const items = [];
   for (const [addonId, opts] of Object.entries(state.value.selectedAddons)) {
-    const addon = addons.find((a) => a.id === addonId);
+    const addon = addons.value.find((a) => a.id === addonId);
     if (!addon) continue;
+
+    const baseName = addon.sizes?.length
+      ? addon.name.replace(/\s*\([^)]*\)$/, "").trim()
+      : addon.name;
+    const name = opts.size ? `${baseName} (${opts.size})` : baseName;
+
     const qty = opts.quantity ?? 1;
-    const name = addon.name + (opts.size ? ` (${opts.size})` : "");
     const value =
       qty > 1
         ? `${name} × ${qty} (${formatCurrency(addon.price * qty)})`
         : `${name} (${formatCurrency(addon.price)})`;
-    items.push({ label: categoryLabels.value[addon.category] ?? addon.category, value });
+    items.push({
+      label: categoryLabels.value[addon.category] ?? addon.category,
+      value,
+    });
   }
   return items;
 });
@@ -149,7 +158,7 @@ const pricingItems = computed(() => {
 
   for (const item of orderItems.value) {
     const addon =
-      item.id !== "ticket" ? addons.find((a) => a.id === item.id) : null;
+      item.id !== "ticket" ? addons.value.find((a) => a.id === item.id) : null;
 
     if (item.discountNote && addon) {
       const fullSubtotal = addon.price * item.quantity;
@@ -174,7 +183,11 @@ const pricingItems = computed(() => {
   }
 
   items.push({ separator: true });
-  items.push({ label: t("review.grandTotal"), value: formattedTotal.value, bold: true });
+  items.push({
+    label: t("review.grandTotal"),
+    value: formattedTotal.value,
+    bold: true,
+  });
 
   return items;
 });
@@ -190,7 +203,7 @@ const pricingItems = computed(() => {
       :messages="allErrorMessages"
     />
 
-    <h2 class="text-h3 text-neutral">{{ t('review.title') }}</h2>
+    <h2 class="text-h3 text-neutral">{{ t("review.title") }}</h2>
 
     <!-- Attendee Information -->
     <NitraReviewSection

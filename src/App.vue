@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
-import { event } from "./mocks/event.js";
 import { useEventRegistration } from "./composables/useEventRegistration.js";
 import logoUrl from "./assets/images/logo.svg";
 
@@ -39,6 +38,7 @@ const STEP_VIEWS = {
 
 const {
   state,
+  event,
   nextStep,
   prevStep,
   goToStep,
@@ -110,7 +110,7 @@ onBeforeUnmount(() =>
   <div class="h-screen bg-surface-l0 flex flex-col overflow-hidden">
     <!-- ── Sticky Header ────────────────────────────────────── -->
     <header
-      class="shrink-0 border-b border-[var(--divider-default)] px-12 py-4 bg-surface-l0 z-20"
+      class="shrink-0 border-0 border-solid border-b border-[var(--divider-default)] px-12 py-4 bg-surface-l0 z-20"
     >
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -158,7 +158,7 @@ onBeforeUnmount(() =>
     <template v-else>
       <!-- Sticky Stepper -->
       <div
-        class="border-solid shrink-0 border-b border-[var(--divider-default)] px-[120px] py-6 bg-surface-l0 z-10"
+        class="border-0 border-solid shrink-0 border-b border-[var(--divider-default)] px-[120px] py-6 bg-surface-l0 z-10"
       >
         <NitraStepper
           v-model="state.currentStep"
@@ -177,7 +177,7 @@ onBeforeUnmount(() =>
 
       <!-- Sticky Footer -->
       <footer
-        class="border-solid shrink-0 border-t border-[var(--divider-default)] px-[120px] py-4 bg-surface-l0 flex justify-between items-center z-20"
+        class="border-0 border-solid shrink-0 border-t border-[var(--divider-default)] px-[120px] py-4 bg-surface-l0 flex justify-between items-center z-20"
       >
         <NitraButton
           v-if="hasPrev"

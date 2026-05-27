@@ -1,16 +1,13 @@
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { event } from "src/mocks/event";
-import { sessions } from "src/mocks/sessions";
-import { addons } from "src/mocks/addons";
+import { event as rawEvent } from "src/mocks/event";
+import { sessions as rawSessions } from "src/mocks/sessions";
+import { addons as rawAddons } from "src/mocks/addons";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const TOTAL_STEPS = 4;
 const VIP_WORKSHOP_DISCOUNT = 0.1;
-
-/** Ticket lookup keyed by id for O(1) access */
-const TICKET_MAP = Object.fromEntries(event.ticketTypes.map((t) => [t.id, t]));
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Allows +, digits, spaces, dashes, dots, parens — 7–20 chars
@@ -25,6 +22,29 @@ const PHONE_RE = /^\+?[\d\s\-().]{7,20}$/;
  */
 function hasTimeOverlap(aStart, aEnd, bStart, bEnd) {
   return aStart < bEnd && bStart < aEnd;
+}
+
+/**
+ * Recursively localizes an object or array based on the target language.
+ * @param {any} data
+ * @param {string} lang
+ */
+function localize(data, lang) {
+  if (Array.isArray(data)) {
+    return data.map((item) => localize(item, lang));
+  } else if (data !== null && typeof data === "object") {
+    // If it's a leaf localization node (has the target language key)
+    if (data[lang] !== undefined) {
+      return data[lang];
+    }
+    // Otherwise, recurse
+    const result = {};
+    for (const [key, value] of Object.entries(data)) {
+      result[key] = localize(value, lang);
+    }
+    return result;
+  }
+  return data;
 }
 
 function makeInitialState() {
@@ -68,6 +88,17 @@ const touchedSteps = ref(new Set());
 export function useEventRegistration() {
   const { t, locale } = useI18n();
 
+  // ── Reactive Localized Data ──────────────────────────────────────────
+
+  const event = computed(() => localize(rawEvent, locale.value));
+  const sessions = computed(() => localize(rawSessions, locale.value));
+  const addons = computed(() => localize(rawAddons, locale.value));
+
+  /** Ticket lookup keyed by id for O(1) access */
+  const TICKET_MAP = computed(() =>
+    Object.fromEntries(event.value.ticketTypes.map((t) => [t.id, t])),
+  );
+
   /** Formats a number as $X,XXX.XX */
   function formatCurrency(amount) {
     return new Intl.NumberFormat("en-US", {
@@ -81,9 +112,9 @@ export function useEventRegistration() {
 
   /** Sessions grouped by calendar date string (YYYY-MM-DD) */
   const sessionsByDate = computed(() => {
-    /** @type {Map<string, typeof sessions>} */
+    /** @type {Map<string, any>} */
     const map = new Map();
-    for (const session of sessions) {
+    for (const session of sessions.value) {
       const day = session.date.slice(0, 10);
       if (!map.has(day)) map.set(day, []);
       map.get(day).push(session);
@@ -93,7 +124,7 @@ export function useEventRegistration() {
 
   /** Full session objects that are currently selected */
   const selectedSessions = computed(() =>
-    sessions.filter((s) => state.value.selectedSessionIds.includes(s.id)),
+    sessions.value.filter((s) => state.value.selectedSessionIds.includes(s.id)),
   );
 
   /**
@@ -127,9 +158,9 @@ export function useEventRegistration() {
 
   /** Add-ons grouped by category string */
   const addonsByCategory = computed(() => {
-    /** @type {Map<string, typeof addons>} */
+    /** @type {Map<string, any>} */
     const map = new Map();
-    for (const addon of addons) {
+    for (const addon of addons.value) {
       if (!map.has(addon.category)) map.set(addon.category, []);
       map.get(addon.category).push(addon);
     }
@@ -143,7 +174,7 @@ export function useEventRegistration() {
   const workshopConflictIds = computed(() => {
     const selected = selectedSessions.value;
     const conflicting = new Set();
-    for (const addon of addons) {
+    for (const addon of addons.value) {
       if (addon.category !== "workshop") continue;
       for (const session of selected) {
         if (
@@ -162,10 +193,42 @@ export function useEventRegistration() {
     return conflicting;
   });
 
+  /** Full workshop objects that are currently selected */
+  const selectedWorkshops = computed(() =>
+    addons.value.filter(
+      (a) => a.category === "workshop" && state.value.selectedAddons[a.id],
+    ),
+  );
+
+  /**
+   * Set of session IDs that overlap with at least one selected workshop.
+   * These should be shown as unavailable in the UI.
+   */
+  const sessionWorkshopConflictIds = computed(() => {
+    const selected = selectedWorkshops.value;
+    const conflicting = new Set();
+    for (const session of sessions.value) {
+      for (const workshop of selected) {
+        if (
+          hasTimeOverlap(
+            new Date(session.date).getTime(),
+            new Date(session.endDate).getTime(),
+            new Date(workshop.date).getTime(),
+            new Date(workshop.endDate).getTime(),
+          )
+        ) {
+          conflicting.add(session.id);
+          break;
+        }
+      }
+    }
+    return conflicting;
+  });
+
   /** True when at least one merchandise item is in the cart */
   const hasMerchandise = computed(() =>
     Object.keys(state.value.selectedAddons).some((id) => {
-      const addon = addons.find((a) => a.id === id);
+      const addon = addons.value.find((a) => a.id === id);
       return addon?.category === "merchandise";
     }),
   );
@@ -176,7 +239,7 @@ export function useEventRegistration() {
 
   const ticketPrice = computed(() => {
     const { ticketType } = state.value.attendeeInfo;
-    return ticketType ? (TICKET_MAP[ticketType]?.price ?? 0) : 0;
+    return ticketType ? (TICKET_MAP.value[ticketType]?.price ?? 0) : 0;
   });
 
   /**
@@ -188,7 +251,7 @@ export function useEventRegistration() {
     const { ticketType } = state.value.attendeeInfo;
 
     if (ticketType) {
-      const ticket = TICKET_MAP[ticketType];
+      const ticket = TICKET_MAP.value[ticketType];
       items.push({
         id: "ticket",
         label: `${ticket.name} Ticket`,
@@ -199,7 +262,7 @@ export function useEventRegistration() {
     }
 
     for (const [addonId, opts] of Object.entries(state.value.selectedAddons)) {
-      const addon = addons.find((a) => a.id === addonId);
+      const addon = addons.value.find((a) => a.id === addonId);
       if (!addon) continue;
       const qty = opts.quantity ?? 1;
       const isWorkshop = addon.category === "workshop";
@@ -207,14 +270,20 @@ export function useEventRegistration() {
         isWorkshop && isVip.value
           ? addon.price * (1 - VIP_WORKSHOP_DISCOUNT)
           : addon.price;
+
+      const baseName = addon.sizes?.length
+        ? addon.name.replace(/\s*\([^)]*\)$/, "").trim()
+        : addon.name;
+      const label = opts.size ? `${baseName} (${opts.size})` : baseName;
+
       const item = {
         id: addonId,
-        label: addon.name + (opts.size ? ` (${opts.size})` : ""),
+        label,
         unitPrice,
         quantity: qty,
         subtotal: unitPrice * qty,
       };
-      if (isWorkshop && isVip.value) item.discountNote = "VIP 10% off";
+      if (isWorkshop && isVip.value) item.discountNote = t("addons.workshopDiscount");
       items.push(item);
     }
 
@@ -279,7 +348,7 @@ export function useEventRegistration() {
 
     // Step 3 — merchandise size selection
     for (const [addonId, opts] of Object.entries(selectedAddons)) {
-      const addon = addons.find((a) => a.id === addonId);
+      const addon = addons.value.find((a) => a.id === addonId);
       if (addon?.sizes?.length && !opts.size)
         errors.step3.push(t("errors.sizeRequired", { name: addon.name }));
     }
@@ -345,7 +414,7 @@ export function useEventRegistration() {
    * @param {{ quantity?: number, size?: string | null }} [opts]
    */
   function updateAddon(addonId, opts = {}) {
-    const addon = addons.find((a) => a.id === addonId);
+    const addon = addons.value.find((a) => a.id === addonId);
     if (!addon) return;
     if (!state.value.selectedAddons[addonId]) {
       state.value.selectedAddons[addonId] = { quantity: 1, size: null };
@@ -396,6 +465,11 @@ export function useEventRegistration() {
     // Raw state — expose so components can bind to nested fields directly
     state,
 
+    // Localized data
+    event,
+    sessions,
+    addons,
+
     // Derived: sessions
     sessionsByDate,
     selectedSessions,
@@ -404,6 +478,7 @@ export function useEventRegistration() {
     // Derived: add-ons
     addonsByCategory,
     workshopConflictIds,
+    sessionWorkshopConflictIds,
     hasMerchandise,
 
     // Derived: ticket
@@ -441,6 +516,6 @@ export function useEventRegistration() {
 
     // Constants (useful for templates)
     TOTAL_STEPS,
-    ticketTypes: event.ticketTypes,
+    ticketTypes: computed(() => event.value.ticketTypes),
   };
 }

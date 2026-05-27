@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { addons } from "../mocks/addons.js";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraTabBar from "../components/NitraTabBar.vue";
 import NitraAddonCard from "../components/NitraAddonCard.vue";
@@ -11,6 +10,7 @@ import NitraReviewSection from "../components/NitraReviewSection.vue";
 const { t } = useI18n();
 const {
   state,
+  addons,
   addonsByCategory,
   workshopConflictIds,
   isVip,
@@ -34,6 +34,17 @@ const activeCategory = ref("workshop");
 const currentAddons = computed(
   () => addonsByCategory.value.get(activeCategory.value) ?? [],
 );
+
+// ── Conflict alert logic ─────────────────────────────────────────────
+
+const workshopAddons = computed(
+  () => addonsByCategory.value.get("workshop") ?? [],
+);
+
+const noWorkshopsAvailable = computed(() => {
+  if (workshopAddons.value.length === 0) return false;
+  return workshopAddons.value.every((addon) => isAddonDisabled(addon));
+});
 
 // ── Disabled logic ────────────────────────────────────────────────────
 
@@ -61,7 +72,7 @@ const summaryItems = computed(() => {
 
   for (const item of orderItems.value) {
     const addon =
-      item.id !== "ticket" ? addons.find((a) => a.id === item.id) : null;
+      item.id !== "ticket" ? addons.value.find((a) => a.id === item.id) : null;
 
     if (item.discountNote && addon) {
       const fullSubtotal = addon.price * item.quantity;
@@ -86,7 +97,11 @@ const summaryItems = computed(() => {
   }
 
   items.push({ separator: true });
-  items.push({ label: t("addons.total"), value: formattedTotal.value, bold: true });
+  items.push({
+    label: t("addons.total"),
+    value: formattedTotal.value,
+    bold: true,
+  });
 
   return items;
 });
@@ -96,7 +111,7 @@ const summaryItems = computed(() => {
   <div class="flex gap-8 items-start">
     <!-- ── Add-ons list ─────────────────────────────── -->
     <div class="flex flex-col gap-6 flex-1 min-w-0">
-      <h2 class="text-h3 text-neutral">{{ t('addons.title') }}</h2>
+      <h2 class="text-h3 text-neutral">{{ t("addons.title") }}</h2>
 
       <NitraTabBar
         :model-value="activeCategory"
@@ -120,6 +135,14 @@ const summaryItems = computed(() => {
         :message="t('addons.vipLunchMsg')"
       />
 
+      <!-- Workshop conflict notice (when all workshops are blocked by session selections or sold out) -->
+      <NitraAlert
+        v-if="activeCategory === 'workshop' && noWorkshopsAvailable"
+        variant="info"
+        :title="t('addons.workshopConflictTitle')"
+        :message="t('addons.workshopConflictMsg')"
+      />
+
       <!-- Addon cards -->
       <NitraAddonCard
         v-for="addon in currentAddons"
@@ -127,13 +150,12 @@ const summaryItems = computed(() => {
         :addon="addon"
         :model-value="state.selectedAddons[addon.id] ?? null"
         :disabled="isAddonDisabled(addon)"
-        :vip-discount="isVip"
         @update:model-value="handleAddonUpdate(addon.id, $event)"
       />
     </div>
 
     <!-- ── Order summary sidebar ──────────────────────── -->
-    <div class="shrink-0 w-[380px]">
+    <div class="sticky top-10 shrink-0 w-[380px]">
       <NitraReviewSection
         :title="t('addons.orderSummary')"
         :compact="true"
