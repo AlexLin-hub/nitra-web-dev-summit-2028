@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import { useI18n } from "vue-i18n";
-import { event } from "./mocks/event.js";
 import { useEventRegistration } from "./composables/useEventRegistration.js";
 import logoUrl from "./assets/images/logo.svg";
 
@@ -39,6 +38,7 @@ const STEP_VIEWS = {
 
 const {
   state,
+  event,
   nextStep,
   prevStep,
   goToStep,

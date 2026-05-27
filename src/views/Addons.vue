@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { addons } from "../mocks/addons.js";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraTabBar from "../components/NitraTabBar.vue";
 import NitraAddonCard from "../components/NitraAddonCard.vue";
@@ -11,6 +10,7 @@ import NitraReviewSection from "../components/NitraReviewSection.vue";
 const { t } = useI18n();
 const {
   state,
+  addons,
   addonsByCategory,
   workshopConflictIds,
   isVip,
@@ -61,7 +61,7 @@ const summaryItems = computed(() => {
 
   for (const item of orderItems.value) {
     const addon =
-      item.id !== "ticket" ? addons.find((a) => a.id === item.id) : null;
+      item.id !== "ticket" ? addons.value.find((a) => a.id === item.id) : null;
 
     if (item.discountNote && addon) {
       const fullSubtotal = addon.price * item.quantity;

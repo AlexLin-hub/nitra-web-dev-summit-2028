@@ -1,12 +1,11 @@
 <script setup>
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { event } from "../mocks/event.js";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraButton from "../components/NitraButton.vue";
 
 const { t } = useI18n();
-const { state, reset, ticketTypes } = useEventRegistration();
+const { state, event, reset, ticketTypes } = useEventRegistration();
 
 const firstName = computed(() => {
   const name = state.value.attendeeInfo.fullName.trim();
@@ -14,7 +13,7 @@ const firstName = computed(() => {
 });
 
 const ticketName = computed(() => {
-  const ticket = ticketTypes.find(
+  const ticket = ticketTypes.value.find(
     (t) => t.id === state.value.attendeeInfo.ticketType,
   );
   return ticket?.name ?? "";
@@ -31,11 +30,13 @@ const ticketName = computed(() => {
     </div>
 
     <!-- Title -->
-    <p class="text-h2 text-success whitespace-nowrap">{{ t('success.title') }}</p>
+    <p class="text-h2 text-success whitespace-nowrap">
+      {{ t("success.title") }}
+    </p>
 
     <!-- Confirmation number -->
     <p class="text-[length:var(--font-size-lg)] leading-[24px] text-neutral">
-      {{ t('success.confirmation', { id: state.orderId }) }}
+      {{ t("success.confirmation", { id: state.orderId }) }}
     </p>
 
     <!-- Thank you message -->
@@ -43,10 +44,16 @@ const ticketName = computed(() => {
       class="text-[length:var(--font-size-sm)] leading-[16px] text-neutral-muted"
     >
       <p>
-        {{ t('success.thankYou', { name: firstName, ticket: ticketName, event: event.name }) }}
+        {{
+          t("success.thankYou", {
+            name: firstName,
+            ticket: ticketName,
+            event: event.name,
+          })
+        }}
       </p>
       <p>
-        {{ t('success.emailNotice', { email: state.attendeeInfo.email }) }}
+        {{ t("success.emailNotice", { email: state.attendeeInfo.email }) }}
       </p>
     </div>
 
