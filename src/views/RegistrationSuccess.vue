@@ -30,7 +30,7 @@ const ticketName = computed(() => {
     </div>
 
     <!-- Title -->
-    <p class="text-h2 text-success whitespace-nowrap">
+    <p class="text-h2 text-success">
       {{ t("success.title") }}
     </p>
 

@@ -83,7 +83,7 @@ const stepCount = computed(() => props.steps.length);
         </button>
 
         <span
-          class="whitespace-nowrap text-[13px] leading-none transition-colors duration-150"
+          class="step-label whitespace-nowrap text-[13px] leading-none transition-colors duration-150"
           :class="{
             'text-neutral font-semibold': getStepState(index) === 'active',
             'text-neutral font-medium': getStepState(index) === 'completed',
@@ -108,3 +108,14 @@ const stepCount = computed(() => props.steps.length);
     </template>
   </div>
 </template>
+
+<style scoped>
+.step-label {
+  display: none;
+}
+@screen sm {
+  .step-label {
+    display: inline;
+  }
+}
+</style>

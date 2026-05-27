@@ -101,7 +101,7 @@ const selectedCount = computed(() => state.value.selectedSessionIds.length);
     />
 
     <!-- Session grid -->
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <NitraSessionCard
         v-for="session in currentSessions"
         :key="session.id"
