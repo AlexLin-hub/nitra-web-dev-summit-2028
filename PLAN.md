@@ -61,6 +61,11 @@ _Beyond the basic requirements, I implemented several business-driven UX enhance
   - Error states and validation messages are only triggered _after_ the user attempts to click "Next" or "input blur" or passes the step, preventing premature error flashing.
   - Synchronized disabled states for sessions and workshops to prevent time-conflict selections in real-time.
   - Auto-selected the first available product size when a user checks a merchandise item.
+  - **Comprehensive Responsive Layout (RWD)**: Fully optimized the application for Desktop, Tablet, and Mobile.
+    - **Header & Stepper**: Scaled padding responsively (`px-4 sm:px-8 lg:px-[120px]`). Hides stepper labels and dynamically shortens language options (e.g. `繁體中文` -> `繁中`, `English` -> `EN`) on mobile while preserving the event name.
+    - **Attendee Info**: Refactored the ticket-type grid (`grid-cols-3` -> `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`) and form inputs (`grid-cols-2` -> `grid-cols-1 sm:grid-cols-2`) for comfortable single-column layouts on mobile.
+    - **Sessions**: Stacked the session-card grid from 2 columns down to 1 on mobile screens.
+    - **Add-ons**: Transformed the side-by-side sticky layout into a stacked layout (`flex-col lg:flex-row`) where the order summary smoothly wraps beneath the add-on categories on small viewports.
 
 ---
 
@@ -70,4 +75,3 @@ Given more time, I would elevate the project further by:
 
 1. **Testing:** Implementing comprehensive unit tests using **Vitest** to cover the time-conflict algorithms and price calculation logic in the composable.
 2. **Backend Integration:** Deploying to Firebase Hosting and integrating Firestore for real-time ticket inventory management and automated confirmation emails.
-3. **Responsive Web Design (RWD):** Further optimizing the mobile layout for smaller viewports.
