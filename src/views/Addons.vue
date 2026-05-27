@@ -86,7 +86,11 @@ const summaryItems = computed(() => {
   }
 
   items.push({ separator: true });
-  items.push({ label: t("addons.total"), value: formattedTotal.value, bold: true });
+  items.push({
+    label: t("addons.total"),
+    value: formattedTotal.value,
+    bold: true,
+  });
 
   return items;
 });
@@ -96,7 +100,7 @@ const summaryItems = computed(() => {
   <div class="flex gap-8 items-start">
     <!-- ── Add-ons list ─────────────────────────────── -->
     <div class="flex flex-col gap-6 flex-1 min-w-0">
-      <h2 class="text-h3 text-neutral">{{ t('addons.title') }}</h2>
+      <h2 class="text-h3 text-neutral">{{ t("addons.title") }}</h2>
 
       <NitraTabBar
         :model-value="activeCategory"
@@ -133,7 +137,7 @@ const summaryItems = computed(() => {
     </div>
 
     <!-- ── Order summary sidebar ──────────────────────── -->
-    <div class="shrink-0 w-[380px]">
+    <div class="sticky top-10 shrink-0 w-[380px]">
       <NitraReviewSection
         :title="t('addons.orderSummary')"
         :compact="true"
