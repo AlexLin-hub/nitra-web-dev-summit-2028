@@ -79,7 +79,7 @@ const { t } = useI18n();
         class="shrink-0 text-[length:var(--font-size-sm)] leading-[16px] font-semibold text-brand underline outline-none hover:no-underline focus-visible:no-underline"
         @click="emit('edit', step)"
       >
-        {{ t('review.edit', { step }) }}
+        {{ t("review.edit", { step }) }}
       </button>
     </div>
 
@@ -92,7 +92,10 @@ const { t } = useI18n();
     </div>
     <template v-else v-for="(item, index) in items" :key="index">
       <!-- Optional divider before this row -->
-      <div v-if="item.separator" class="border-solid divider-muted border-t" />
+      <div
+        v-if="item.separator"
+        class="border-0 border-solid border-solid divider-muted border-t"
+      />
 
       <!-- Discount row (11px text-brand-emphasis) -->
       <div
