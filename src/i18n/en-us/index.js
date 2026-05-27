@@ -63,6 +63,8 @@ export default {
     soldOut: 'Sold Out',
     spotsLeft: '{count} spots left',
     noSessions: 'No sessions available for this date.',
+    noneSelectedTitle: 'No sessions selected yet',
+    noneSelectedMsg: 'Feel free to pick the sessions you\'re interested in, or skip ahead — you can decide on-site.',
   },
   addons: {
     title: 'Select Add-ons',

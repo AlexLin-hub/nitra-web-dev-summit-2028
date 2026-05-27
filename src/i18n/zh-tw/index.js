@@ -63,6 +63,8 @@ export default {
     soldOut: '已售罄',
     spotsLeft: '剩餘 {count} 個名額',
     noSessions: '此日期目前沒有可選議程。',
+    noneSelectedTitle: '尚未選擇任何議程',
+    noneSelectedMsg: '您可以選擇感興趣的場次，或直接前往下一步，入場當天再決定。',
   },
   addons: {
     title: '加購項目',

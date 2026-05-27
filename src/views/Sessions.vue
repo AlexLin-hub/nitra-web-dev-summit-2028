@@ -4,6 +4,7 @@ import { useI18n } from "vue-i18n";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 import NitraTabBar from "../components/NitraTabBar.vue";
 import NitraSessionCard from "../components/NitraSessionCard.vue";
+import NitraAlert from "../components/NitraAlert.vue";
 
 const { t, locale } = useI18n();
 const {
@@ -85,13 +86,19 @@ const selectedCount = computed(() => state.value.selectedSessionIds.length);
       @update:model-value="activeDate = $event"
     />
 
-    <!-- Selection count -->
+    <!-- Selection count / no-selection hint -->
     <p
       v-if="selectedCount > 0"
       class="text-[length:var(--font-size-sm)] text-neutral-muted"
     >
       {{ t("common.itemsSelected", { count: selectedCount }) }}
     </p>
+    <NitraAlert
+      v-else
+      variant="info"
+      :title="t('sessions.noneSelectedTitle')"
+      :message="t('sessions.noneSelectedMsg')"
+    />
 
     <!-- Session grid -->
     <div class="grid grid-cols-2 gap-4">
