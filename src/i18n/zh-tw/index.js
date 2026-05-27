@@ -7,6 +7,7 @@ export default {
     required: '（必填）',
     select: '請選擇',
     added: '已加入訂單',
+    selected: '已選擇',
     spotsRemaining: '剩餘 {count} 個名額',
     maxQuantity: '上限 {count} 件',
     itemsSelected: '已選擇 {count} 個場次',
@@ -83,6 +84,7 @@ export default {
   review: {
     title: '確認報名資訊',
     edit: '編輯 → 第 {step} 步',
+    ticketLabel: '{name}',
     pricingSummary: '費用明細',
     grandTotal: '總計金額',
   },

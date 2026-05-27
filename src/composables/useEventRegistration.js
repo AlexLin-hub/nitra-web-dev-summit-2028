@@ -254,7 +254,7 @@ export function useEventRegistration() {
       const ticket = TICKET_MAP.value[ticketType];
       items.push({
         id: "ticket",
-        label: `${ticket.name} Ticket`,
+        label: t("review.ticketLabel", { name: ticket.name }),
         unitPrice: ticket.price,
         quantity: 1,
         subtotal: ticket.price,

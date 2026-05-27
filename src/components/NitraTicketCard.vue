@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { useEventRegistration } from "../composables/useEventRegistration.js";
 
 const props = defineProps({
@@ -35,6 +36,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"]);
 
+const { t } = useI18n();
 const { formatCurrency } = useEventRegistration();
 
 const isSelected = computed(() => props.modelValue === props.value);
@@ -100,7 +102,7 @@ const formattedPrice = computed(() => formatCurrency(props.price));
       class="self-start inline-flex items-center rounded-full bg-success-bold-rest px-[9px] py-[3px] text-[11px] leading-[14px] text-inverse font-medium"
     >
       <q-icon name="check" size="14px" class="mr-1" />
-      Selected
+      {{ t('common.selected') }}
     </span>
   </div>
 </template>
